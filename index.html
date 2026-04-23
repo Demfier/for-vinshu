@@ -5,8 +5,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>For Vinshu, with love ✦</title>
+<meta name="description" content="A little something, on her wedding day.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="For Vinshu">
+<meta property="og:description" content="A little something, on her wedding day.">
+<meta property="og:url" content="https://demfier.github.io/for-vinshu/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="For Vinshu">
+<meta name="twitter:description" content="A little something, on her wedding day.">
   <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Marcellus&family=Tangerine:wght@400;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Marcellus&family=Tangerine:wght@400;700&display=swap"
     rel="stylesheet">
   <style>
     :root {
@@ -285,8 +293,8 @@
     /* ----------- STAGE 2: MEHNDI (layered canvas, tap-to-reveal) ----------- */
     .mehndi-wrap {
       position: relative;
-      width: 360px;
-      height: 360px;
+      width: min(360px, 86vw);
+      aspect-ratio: 1 / 1;
     }
 
     #mehndi-base,
@@ -905,6 +913,12 @@
       line-height: 1.5;
     }
 
+    .vow-text b {
+      font-weight: 700;
+      color: var(--rose);
+      font-style: italic;
+    }
+
     .vow-text::before,
     .vow-text::after {
       content: '❦';
@@ -921,12 +935,13 @@
       background: var(--maroon);
       color: var(--cream);
       border: none;
-      padding: 9px 26px;
-      font-size: 0.8rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
+      width: 52px;
+      height: 52px;
+      padding: 0;
+      font-size: 1.5rem;
+      line-height: 1;
       cursor: pointer;
-      border-radius: 2px;
+      border-radius: 50%;
       box-shadow: 0 3px 0 var(--deep-maroon), 0 4px 10px rgba(74, 14, 26, 0.25);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
@@ -1193,6 +1208,93 @@
       margin-left: 0.4em;
     }
 
+    /* Stage intro dialog — shows briefly before each ceremony begins */
+    .stage-intro {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(253, 244, 227, 0.85);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.55s ease;
+      z-index: 50;
+      padding: 24px;
+    }
+    .stage-intro.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .stage-intro-card {
+      max-width: min(460px, 90vw);
+      padding: 32px 34px 26px;
+      background: rgba(253, 244, 227, 0.98);
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      box-shadow:
+        0 14px 40px rgba(107, 31, 43, 0.3),
+        0 0 0 4px rgba(244, 168, 37, 0.1);
+      text-align: center;
+      transform: translateY(10px) scale(0.95);
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .stage-intro.active .stage-intro-card {
+      transform: translateY(0) scale(1);
+    }
+    .stage-intro-hindi {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: var(--henna);
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+    .stage-intro-title {
+      font-size: clamp(1.9rem, 5vw, 2.5rem);
+      color: var(--maroon);
+      margin-bottom: 2px;
+    }
+    .stage-intro-ornament {
+      color: var(--gold);
+      font-size: 1rem;
+      opacity: 0.65;
+      margin: 6px 0 16px;
+    }
+    .stage-intro-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 2.2vw, 1.15rem);
+      color: var(--ink);
+      line-height: 1.55;
+      max-width: 380px;
+      margin: 0 auto 22px;
+      font-style: italic;
+    }
+    .stage-intro-begin {
+      font-family: 'Marcellus', serif;
+      background: var(--maroon);
+      color: var(--cream);
+      border: none;
+      padding: 11px 28px;
+      font-size: 0.85rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      box-shadow: 0 3px 0 var(--deep-maroon), 0 4px 10px rgba(74, 14, 26, 0.25);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .stage-intro-begin:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 var(--deep-maroon), 0 6px 14px rgba(74, 14, 26, 0.3);
+    }
+    .stage-intro-begin:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--deep-maroon), 0 2px 6px rgba(74, 14, 26, 0.25);
+    }
+
     @media (max-height: 700px) {
       .title {
         font-size: clamp(3rem, 8vw, 5rem);
@@ -1220,6 +1322,17 @@
   <div class="corner br">❦</div>
 
   <div id="game">
+
+    <!-- ============ STAGE INTRO DIALOG (reused by each ceremony) ============ -->
+    <div class="stage-intro" id="stage-intro" role="dialog" aria-modal="true" aria-labelledby="stage-intro-title">
+      <div class="stage-intro-card">
+        <div class="stage-intro-hindi" id="stage-intro-hindi"></div>
+        <h2 class="stage-intro-title" id="stage-intro-title"></h2>
+        <div class="stage-intro-ornament">⸻ ❦ ⸻</div>
+        <p class="stage-intro-text" id="stage-intro-text"></p>
+        <button class="stage-intro-begin" id="stage-intro-begin" type="button">Begin</button>
+      </div>
+    </div>
 
     <!-- ============ WELCOME ============ -->
     <div class="screen active" id="welcome">
@@ -1316,13 +1429,9 @@
         <div class="stage-hindi">Ceremony One</div>
         <h2 class="stage-name">The Haldi</h2>
         <div class="stage-devanagari">हल्दी</div>
-        <p class="instruction">
-          Friends and family shower you with turmeric and petals for a golden glow.
-          Catch them into the basket — all sixteen, for the <em>solah shringaar</em>.
-        </p>
       </div>
       <div id="haldi-area">
-        <div class="haldi-bride" id="haldi-bride" aria-hidden="true">👰🏽</div>
+        <div class="haldi-bride" id="haldi-bride" aria-hidden="true">👧</div>
         <div class="haldi-basket" id="haldi-basket" aria-hidden="true">
           <div class="basket-body"></div>
           <div class="basket-rim"></div>
@@ -1341,10 +1450,6 @@
         <div class="stage-hindi">Ceremony Two</div>
         <h2 class="stage-name">The Mehndi</h2>
         <div class="stage-devanagari">मेहंदी</div>
-        <p class="instruction">
-          Tap the paste to reveal the mehndi hidden beneath — twelve
-          touches and the design shows through completely.
-        </p>
       </div>
       <div class="mehndi-wrap">
         <canvas id="mehndi-base" width="360" height="360" aria-hidden="true"></canvas>
@@ -1361,10 +1466,6 @@
         <div class="stage-hindi">Ceremony Three</div>
         <h2 class="stage-name">The Sangeet</h2>
         <div class="stage-devanagari">संगीत</div>
-        <p class="instruction">
-          Beats drift down from the music. Catch them in turn — each plays
-          the next note of the <em>saat sur</em>: Sa, Re, Ga, Ma, Pa, Dha, Ni.
-        </p>
       </div>
       <div id="sangeet-area">
         <div class="sangeet-status">
@@ -1384,16 +1485,12 @@
         <div class="stage-hindi">The Final Ceremony</div>
         <h2 class="stage-name">The Pheras</h2>
         <div class="stage-devanagari">फेरे</div>
-        <p class="instruction">
-          Seven circles around the sacred fire — each a vow, each a promise.
-          Guide the couple slowly around, together.
-        </p>
       </div>
       <div id="pheras-area">
         <div class="phera-count" id="phera-count">Circle 1 of 7</div>
         <div class="vow-display" id="vow-display">
           <div class="vow-text" id="vow-text"></div>
-          <button class="vow-agree" id="vow-agree" type="button">I agree</button>
+          <button class="vow-agree" id="vow-agree" type="button" aria-label="I agree">✓</button>
         </div>
         <div class="sacred-fire" aria-hidden="true">
           <div class="kund-base"></div>
@@ -1499,16 +1596,58 @@
 
     function startJourney() {
       showStage(1);
-      startHaldi();
+      showStageIntro(1);
     }
 
     function nextStage() {
       const next = currentStage + 1;
       showStage(next);
-      if (next === 2) startMehndi();
-      else if (next === 3) startSangeet();
-      else if (next === 4) startPheras();
+      if (next >= 1 && next <= 4) showStageIntro(next);
       else if (next === 5) startFinale();
+    }
+
+    /* Stage-intro dialog — lets her read the ceremony at her own pace */
+    const STAGE_INTROS = {
+      1: {
+        hindi: 'हल्दी',
+        title: 'The Haldi',
+        text: 'Friends and family anoint you with turmeric and petals — the first golden glow of the day. Catch each one into the basket. Sixteen in all, for the solah shringaar.',
+        start: () => startHaldi(),
+      },
+      2: {
+        hindi: 'मेहंदी',
+        title: 'The Mehndi',
+        text: 'A design is hidden beneath the paste on your palm. Tap to reveal it — twelve touches and the mehndi shows through completely.',
+        start: () => startMehndi(),
+      },
+      3: {
+        hindi: 'संगीत',
+        title: 'The Sangeet',
+        text: 'Music, dance, laughter. Catch the beats in turn — each one plays the next note of the saat sur: Sa, Re, Ga, Ma, Pa, Dha, Ni.',
+        start: () => startSangeet(),
+      },
+      4: {
+        hindi: 'फेरे',
+        title: 'The Pheras',
+        text: 'Seven circles around the sacred fire. Guide the couple slowly around, together. After each circle, take a vow.',
+        start: () => startPheras(),
+      },
+    };
+
+    function showStageIntro(stageIndex) {
+      const info = STAGE_INTROS[stageIndex];
+      if (!info) return;
+      document.getElementById('stage-intro-hindi').textContent = info.hindi;
+      document.getElementById('stage-intro-title').textContent = info.title;
+      document.getElementById('stage-intro-text').textContent = info.text;
+      const intro = document.getElementById('stage-intro');
+      const btn = document.getElementById('stage-intro-begin');
+      intro.classList.add('active');
+      // Replace click handler so the right stage starts when button is pressed
+      btn.onclick = () => {
+        intro.classList.remove('active');
+        setTimeout(() => info.start(), 320);
+      };
     }
 
     /* =================== STAGE 1: HALDI =================== */
@@ -1985,6 +2124,96 @@
       playTone(392.00, 1.0, 14 * B, 0.08, 'sine');
     }
 
+    /* =================== AMBIENT MUSIC (pheras + finale) =================== */
+    let ambientNodes = null;
+
+    function startAmbient(config) {
+      stopAmbient();
+      const ctx = ensureAudio();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0, t);
+      master.gain.linearRampToValueAtTime(config.gain || 0.05, t + 2.5);
+      master.connect(ctx.destination);
+
+      const oscillators = [];
+      config.drone.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        // Subtle detune on secondary drones so they beat against each other
+        if (i > 0) osc.detune.value = (Math.random() - 0.5) * 6;
+        g.gain.value = 1 / config.drone.length;
+        osc.connect(g).connect(master);
+        osc.start(t);
+        oscillators.push(osc);
+      });
+
+      // Slow melody over the drone
+      let melodyTimer = null;
+      if (config.melody && config.melody.length) {
+        const intervalMs = (config.melodyInterval || 3.5) * 1000;
+        const playMelody = () => {
+          if (!ambientNodes || !audioCtx) return;
+          const notes = config.melody;
+          const note = notes[Math.floor(Math.random() * notes.length)];
+          const mt = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          osc.type = config.melodyType || 'triangle';
+          osc.frequency.value = note;
+          const dur = config.melodyDur || 1.6;
+          g.gain.setValueAtTime(0, mt);
+          g.gain.linearRampToValueAtTime(0.1, mt + 0.3);
+          g.gain.exponentialRampToValueAtTime(0.001, mt + dur);
+          osc.connect(g).connect(master);
+          osc.start(mt);
+          osc.stop(mt + dur + 0.1);
+        };
+        setTimeout(playMelody, 900);
+        melodyTimer = setInterval(playMelody, intervalMs);
+      }
+
+      ambientNodes = { master, oscillators, melodyTimer };
+    }
+
+    function stopAmbient() {
+      if (!ambientNodes || !audioCtx) { ambientNodes = null; return; }
+      const { master, oscillators, melodyTimer } = ambientNodes;
+      ambientNodes = null;
+      clearInterval(melodyTimer);
+      const t = audioCtx.currentTime;
+      try {
+        master.gain.cancelScheduledValues(t);
+        master.gain.setValueAtTime(master.gain.value, t);
+        master.gain.linearRampToValueAtTime(0, t + 1.5);
+      } catch (e) {}
+      oscillators.forEach(osc => {
+        try { osc.stop(t + 1.7); } catch (e) {}
+      });
+    }
+
+    const AMBIENT_PHERAS = {
+      drone: [130.81, 196.00],        // Sa + Pa (C3 + G3) — tanpura-style
+      melody: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25], // Sa Re Ga Pa Dha Sa'
+      melodyInterval: 3.8,
+      melodyDur: 1.8,
+      melodyType: 'sine',
+      gain: 0.05,
+    };
+
+    const AMBIENT_FINALE = {
+      drone: [130.81, 261.63],        // Sa + Sa' (C3 + C4) — warm octaves
+      melody: [329.63, 392.00, 440.00, 523.25, 659.25], // Ga Pa Dha Sa' Ga' — major
+      melodyInterval: 4.8,
+      melodyDur: 2.2,
+      melodyType: 'sine',
+      gain: 0.04,
+    };
+
     function updateSangeetUI() {
       document.getElementById('sangeet-hits').textContent = 'Caught: ' + sangeetHits + ' / ' + SANGEET_TARGET;
       const nextEl = document.getElementById('sangeet-next');
@@ -2100,20 +2329,20 @@
     let pherasActive = false;
 
     const VOWS = [
-      'With this step, we promise to share food and nurture each other.',
-      'With this step, we vow to grow in strength together.',
-      'With this step, we share our wealth and work for prosperity.',
-      'With this step, we promise to raise a family with love.',
-      "With this step, we care for each other's health and happiness.",
-      'With this step, we promise to be best friends for life.',
-      'With this step, we pledge love and loyalty through every lifetime.',
+      'With this step, we promise to share food and <b>nurture</b> each other.',
+      'With this step, we vow to grow in <b>strength</b> together.',
+      'With this step, we share our wealth and work for <b>prosperity</b>.',
+      'With this step, we promise to raise a <b>family</b> with love.',
+      "With this step, we care for each other's <b>health and happiness</b>.",
+      'With this step, we promise to be <b>best friends</b> for life.',
+      'With this step, we pledge love and <b>loyalty</b> through every lifetime.',
     ];
 
     function showVow(index) {
       const el = document.getElementById('vow-display');
       const textEl = document.getElementById('vow-text');
       if (!el || !textEl || !VOWS[index]) return;
-      textEl.textContent = VOWS[index];
+      textEl.innerHTML = VOWS[index];
       el.classList.add('active');
       pherasActive = false; // freeze circling until user agrees
     }
@@ -2123,6 +2352,7 @@
       if (!el.classList.contains('active')) return;
       el.classList.remove('active');
       if (pheraCount >= 7) {
+        stopAmbient(); // fade out the tanpura before the transition overlay
         setTimeout(() => {
           showTransition('Seven promises. One forever. 🔥', nextStage);
         }, 700);
@@ -2140,6 +2370,7 @@
       angleAccumulator = 0;
       pherasActive = true;
       document.getElementById('phera-count').textContent = 'Circle 1 of 7';
+      startAmbient(AMBIENT_PHERAS);
 
       const area = document.getElementById('pheras-area');
       const couple = document.getElementById('couple');
@@ -2253,6 +2484,8 @@
 
     /* =================== FINALE =================== */
     function startFinale() {
+      // Gentle music beneath the letter
+      startAmbient(AMBIENT_FINALE);
       // Rain petals continuously
       const petals = ['🌸', '🌺', '🌼', '🌷', '💐', '❦', '✦'];
       setInterval(() => {
