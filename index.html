@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>For Vinshu, with love ✦</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%22 y=%2282%22 font-size=%2296%22 text-anchor=%22middle%22 fill=%22%23d4a24c%22>✦</text></svg>">
   <meta name="description" content="A little something, on her wedding day.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="For Vinshu">
@@ -339,11 +340,14 @@
       position: relative;
       width: min(520px, 92vw);
       height: 420px;
-      background: linear-gradient(180deg, #4a0e1a 0%, #6b1f2b 100%);
+      /* Warm afternoon courtyard — cream fading to marigold peach */
+      background:
+        radial-gradient(ellipse at 50% 25%, rgba(255, 220, 150, 0.55), transparent 70%),
+        linear-gradient(180deg, #fde5c0 0%, #f4c88a 55%, #e6a16a 100%);
       border-radius: 12px;
       overflow: hidden;
       border: 2px solid var(--gold);
-      box-shadow: 0 10px 40px rgba(74, 14, 26, 0.4);
+      box-shadow: 0 10px 30px rgba(107, 31, 43, 0.2), inset 0 0 40px rgba(244, 168, 37, 0.15);
     }
 
     /* Sangeet — saat sur note beats */
@@ -373,7 +377,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-weight: 600;
       transition: transform 0.15s ease;
-      box-shadow: 0 0 14px rgba(244, 168, 37, 0.6), 0 0 28px rgba(244, 168, 37, 0.35);
+      box-shadow: 0 2px 8px rgba(139, 58, 31, 0.35), 0 0 18px rgba(139, 58, 31, 0.18);
     }
 
     .note-beat .note-deva {
@@ -489,7 +493,7 @@
       display: flex;
       justify-content: space-between;
       font-family: 'Marcellus', serif;
-      color: var(--cream);
+      color: var(--maroon);
       font-size: 0.95rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
@@ -1010,6 +1014,14 @@
     #finale {
       background:
         radial-gradient(ellipse at center, rgba(253, 244, 227, 0.95), rgba(253, 244, 227, 0.85));
+      /* Let tall letters scroll on short viewports instead of clipping top/bottom */
+      justify-content: flex-start;
+      padding-top: clamp(28px, 7vh, 60px);
+      padding-bottom: clamp(28px, 7vh, 60px);
+      overflow-y: auto;
+    }
+    @media (min-height: 820px) {
+      #finale { justify-content: center; }
     }
 
     .finale-title {
@@ -1655,6 +1667,10 @@
     function startJourney() {
       showStage(1);
       showStageIntro(1);
+      // Gentle ambient carries through haldi + mehndi; sangeet stops it, pheras
+      // and finale replace it with their own tracks.
+      ensureAudio();
+      startAmbient(AMBIENT_SOFT);
     }
 
     function nextStage() {
@@ -1736,27 +1752,23 @@
       osc.stop(t + 0.75);
     }
 
-    // Unique completion sound — staggered major-chord bloom. Plays once when
-    // solah shringar is complete (all 16 caught).
+    // Unique blessing tune — short ascending phrase that resolves on the octave
+    // with a warm low chord beneath. Plays once when solah shringar completes.
     function playShringaarSound() {
-      const ctx = ensureAudio();
-      if (!ctx) return;
-      const t = ctx.currentTime;
-      // C major open chord: Sa, Ga, Pa, Sa' (C4 E4 G4 C5)
-      const notes = [261.63, 329.63, 392.00, 523.25];
-      notes.forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const g = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        const offset = i * 0.08; // arpeggiated entry
-        g.gain.setValueAtTime(0, t + offset);
-        g.gain.linearRampToValueAtTime(0.055, t + offset + 0.15);
-        g.gain.exponentialRampToValueAtTime(0.001, t + offset + 1.5);
-        osc.connect(g).connect(ctx.destination);
-        osc.start(t + offset);
-        osc.stop(t + offset + 1.6);
-      });
+      const seq = [
+        // Ascending arpeggio
+        { f: 261.63, d: 0.00, dur: 0.32, g: 0.09 },  // Sa  (C4)
+        { f: 329.63, d: 0.22, dur: 0.32, g: 0.09 },  // Ga  (E4)
+        { f: 392.00, d: 0.44, dur: 0.32, g: 0.09 },  // Pa  (G4)
+        { f: 523.25, d: 0.66, dur: 1.60, g: 0.13 },  // Sa' (C5, held)
+        // Warm chord underneath the held Sa'
+        { f: 130.81, d: 0.66, dur: 1.60, g: 0.07 },  // Sa  (C3)
+        { f: 196.00, d: 0.66, dur: 1.60, g: 0.06 },  // Pa  (G3)
+        { f: 261.63, d: 0.66, dur: 1.60, g: 0.05 },  // Sa  (C4)
+        // High shimmer that fades in
+        { f: 1046.50, d: 0.88, dur: 1.20, g: 0.03 }, // Sa'' (C6 sparkle)
+      ];
+      seq.forEach(n => playTone(n.f, n.dur, n.d, n.g, 'sine'));
     }
 
     function startHaldi() {
@@ -1908,12 +1920,12 @@
           ], { duration: 820, easing: 'cubic-bezier(0.2, 0, 0.65, 1)', fill: 'forwards' });
 
           anim.onfinish = () => {
-            // Splat into a burst on her face
+            // Splat into a burst on her face — silent this time; the
+            // playShringaarSound blessing tune covers the whole shower.
             f.style.left = (sx + dx) + 'px';
             f.style.top = (sy + dy) + 'px';
             f.style.transform = 'translate(0, 0)';
             f.classList.add('splat');
-            playCatchSound();
             setTimeout(() => f.remove(), 550);
           };
         }, i * 70);
@@ -1937,6 +1949,9 @@
       const mask = document.getElementById('mehndi-mask');
       drawMehndiBase(base.getContext('2d'));
       drawMehndiMask(mask.getContext('2d'));
+      // Reset mask opacity in case a previous playthrough faded it
+      mask.style.transition = 'none';
+      mask.style.opacity = '1';
 
       mehndiStampCount = 0;
       mehndiDone = false;
@@ -2303,12 +2318,14 @@
 
       if (mehndiStampCount >= MEHNDI_TARGET && !mehndiDone) {
         mehndiDone = true;
-        // Fully clear the mask to reveal the complete mandala
-        ctx.clearRect(0, 0, MEHNDI_SIZE, MEHNDI_SIZE);
+        // Smooth reveal — fade the remaining mask opacity to 0 so the mandala
+        // underneath blooms into view instead of appearing instantly.
+        mask.style.transition = 'opacity 1.3s ease';
+        mask.style.opacity = '0';
         document.getElementById('mehndi-progress').textContent = 'Beautiful ✨';
         setTimeout(() => {
           showTransition('A bride-to-be with the prettiest hands 🤎', nextStage);
-        }, 1200);
+        }, 1900);
       }
     }
 
@@ -2483,6 +2500,18 @@
       });
     }
 
+    // Baseline ambient — plays through welcome, haldi, mehndi. Paused during
+    // sangeet (which has its own musical life) and replaced by the pheras
+    // tanpura during the pheras ceremony.
+    const AMBIENT_SOFT = {
+      drone: [196.00, 261.63],        // Pa + Sa' (G3 + C4)
+      melody: [329.63, 392.00, 440.00, 523.25, 587.33], // Ga Pa Dha Sa' Re'
+      melodyInterval: 5.6,
+      melodyDur: 2.4,
+      melodyType: 'sine',
+      gain: 0.13,
+    };
+
     const AMBIENT_PHERAS = {
       drone: [130.81, 196.00],        // Sa + Pa (C3 + G3) — tanpura-style
       melody: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25], // Sa Re Ga Pa Dha Sa'
@@ -2521,6 +2550,8 @@
       sangeetActive = true;
       noteIndex = 0;
       updateSangeetUI();
+      // Sangeet has its own musical identity — silence the background ambient here.
+      stopAmbient();
 
       const area = document.getElementById('sangeet-area');
       area.querySelectorAll('.note-beat').forEach(el => el.remove());
