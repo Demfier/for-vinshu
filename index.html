@@ -1499,7 +1499,7 @@
           <div class="basket-contents" id="basket-contents"></div>
         </div>
       </div>
-      <div class="score-display">Collected: <span id="haldi-score">0</span> / 16<span class="shringaar-hint">solah
+      <div class="score-display">Collected: <span id="haldi-score">0</span> / 16<br><span class="shringaar-hint">solah
           shringaar</span></div>
     </div>
 
@@ -1718,21 +1718,22 @@
     let haldiActive = false;
     let haldiInterval = null;
 
-    // One subtle sound, same every time — used for haldi catches and the final shower.
+    // A soft bell — same gentle tone every time, for haldi catches and the
+    // flower shower. Sine wave, quick-soft attack, slow decay. No chirp.
     function playCatchSound() {
       const ctx = ensureAudio();
       if (!ctx) return;
       const t = ctx.currentTime;
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(920, t);
-      osc.frequency.exponentialRampToValueAtTime(680, t + 0.09);
-      g.gain.setValueAtTime(0.14, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+      osc.type = 'sine';                    // smoothest waveform
+      osc.frequency.setValueAtTime(880, t); // A5, bell-like, not piercing
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.065, t + 0.03); // soft attack
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.45); // gentle decay
       osc.connect(g).connect(ctx.destination);
       osc.start(t);
-      osc.stop(t + 0.22);
+      osc.stop(t + 0.5);
     }
 
     function startHaldi() {
