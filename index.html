@@ -1500,7 +1500,7 @@
           <div class="basket-contents" id="basket-contents"></div>
         </div>
       </div>
-      <div class="score-display">Collected: <span id="haldi-score">0</span> / 16<br><span class="shringaar-hint">solah
+      <div class="score-display">Collected: <span id="haldi-score">0</span> / 16<br><span class="shringaar-hint">
           shringaar</span></div>
     </div>
 
@@ -1591,7 +1591,7 @@
     <div class="screen" id="finale">
       <div class="fade-in" style="animation-delay: 0.3s">
         <div class="ornament">✦ ❦ ✦</div>
-        <h1 class="finale-title">Dear Vinshu</h1>
+        <h1 class="finale-title">Dear<br> Vinshu</h1>
         <div class="scroll-ornament">⸻ ❦ ⸻</div>
       </div>
       <div class="letter fade-in" style="animation-delay: 1s">
@@ -2328,6 +2328,16 @@
       return audioCtx;
     }
 
+    // Safety net: any user interaction (or tab returning to focus) re-primes
+    // the audio context. Prevents the finale music from dying if the browser
+    // auto-suspended the ctx during the long pheras transition or tab switch.
+    ['pointerdown', 'click', 'touchstart', 'keydown'].forEach(evt => {
+      document.addEventListener(evt, ensureAudio, { capture: true, passive: true });
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) ensureAudio();
+    });
+
     // Single tone with a soft envelope — used for notes and victory melody
     function playTone(freq, dur, delay, gain, type) {
       const ctx = ensureAudio();
@@ -2421,7 +2431,7 @@
           osc.frequency.value = note;
           const dur = config.melodyDur || 1.6;
           g.gain.setValueAtTime(0, mt);
-          g.gain.linearRampToValueAtTime(0.1, mt + 0.3);
+          g.gain.linearRampToValueAtTime(0.22, mt + 0.3);
           g.gain.exponentialRampToValueAtTime(0.001, mt + dur);
           osc.connect(g).connect(master);
           osc.start(mt);
@@ -2456,16 +2466,17 @@
       melodyInterval: 3.8,
       melodyDur: 1.8,
       melodyType: 'sine',
-      gain: 0.11,
+      gain: 0.18,
     };
 
     const AMBIENT_FINALE = {
-      drone: [130.81, 261.63],        // Sa + Sa' (C3 + C4) — warm octaves
-      melody: [329.63, 392.00, 440.00, 523.25, 659.25], // Ga Pa Dha Sa' Ga' — major
-      melodyInterval: 4.8,
+      // Warmer, mid-register voicing — cuts through phone speakers better than C3
+      drone: [196.00, 261.63],        // Pa + Sa' (G3 + C4)
+      melody: [329.63, 392.00, 440.00, 523.25, 659.25], // Ga Pa Dha Sa' Ga'
+      melodyInterval: 4.2,
       melodyDur: 2.2,
       melodyType: 'sine',
-      gain: 0.09,
+      gain: 0.22,
     };
 
     function updateSangeetUI() {
