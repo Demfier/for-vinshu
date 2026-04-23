@@ -425,43 +425,29 @@
       }
     }
 
-    /* Each note color-coded through a warm-to-cool gradient so they feel distinct */
+    /* Unified warm palette — gold → marigold → coral → rose → crimson.
+       All hues stay within the wedding palette so they feel of-a-piece on
+       the light cream canvas. */
     .note-beat.n0 {
-      background: radial-gradient(circle, #ffd25e 0%, #c78400 88%);
+      background: radial-gradient(circle, #fff0cc 0%, #e6b45c 88%);
     }
-
     .note-beat.n1 {
-      background: radial-gradient(circle, #ffb347 0%, #a85a10 88%);
+      background: radial-gradient(circle, #ffdc9e 0%, #d98d32 88%);
     }
-
     .note-beat.n2 {
-      background: radial-gradient(circle, #ff7e2e 0%, #a8390d 88%);
+      background: radial-gradient(circle, #ffb87a 0%, #c06820 88%);
     }
-
     .note-beat.n3 {
-      background: radial-gradient(circle, #ff5a6b 0%, #8a1a28 88%);
+      background: radial-gradient(circle, #ff9588 0%, #b34a38 88%);
     }
-
     .note-beat.n4 {
-      background: radial-gradient(circle, #e63aa5 0%, #6b1a5a 88%);
+      background: radial-gradient(circle, #ff7e8a 0%, #a33650 88%);
     }
-
     .note-beat.n5 {
-      background: radial-gradient(circle, #a86be0 0%, #3a1065 88%);
+      background: radial-gradient(circle, #ec5a78 0%, #8a1a42 88%);
     }
-
     .note-beat.n6 {
-      background: radial-gradient(circle, #6baeff 0%, #0c3a85 88%);
-    }
-
-    .note-beat.n5 .note-deva,
-    .note-beat.n6 .note-deva {
-      color: #fff5e0;
-    }
-
-    .note-beat.n5 .note-latin,
-    .note-beat.n6 .note-latin {
-      color: rgba(255, 245, 224, 0.8);
+      background: radial-gradient(circle, #d4325a 0%, #6b0e20 88%);
     }
 
     .hit-flash {
@@ -514,6 +500,7 @@
       border: 1px dashed var(--gold);
       border-radius: 12px;
       overflow: hidden;
+      touch-action: none; /* don't let the browser steal touches for page-scroll */
     }
 
     /* Havan kund — sacred fire pit */
@@ -2509,16 +2496,16 @@
       });
     }
 
-    // Baseline ambient — plays through welcome, haldi, mehndi. Paused during
-    // sangeet (which has its own musical life) and replaced by the pheras
-    // tanpura during the pheras ceremony.
+    // Baseline ambient — sparse gentle chimes only, no drone. Plays through
+    // welcome, haldi, mehndi. Sangeet has its own life; pheras + finale
+    // replace it with their own richer tracks.
     const AMBIENT_SOFT = {
-      drone: [196.00, 261.63],        // Pa + Sa' (G3 + C4)
-      melody: [329.63, 392.00, 440.00, 523.25, 587.33], // Ga Pa Dha Sa' Re'
-      melodyInterval: 5.6,
-      melodyDur: 2.4,
+      drone: [],                      // no drone — just occasional bells
+      melody: [392.00, 440.00, 523.25, 587.33, 659.25, 783.99], // Pa Dha Sa' Re' Ga' Pa'
+      melodyInterval: 7.5,            // sparse — about a note every 7.5s
+      melodyDur: 2.8,                 // long bell decay
       melodyType: 'sine',
-      gain: 0.13,
+      gain: 0.16,
     };
 
     const AMBIENT_PHERAS = {
@@ -2707,10 +2694,13 @@
 
       function handleMove(e) {
         if (!pherasActive) return;
+        // Prevent page-scroll while circling on touch devices
+        if (e.cancelable && e.type !== 'mousemove') e.preventDefault();
         const rect = area.getBoundingClientRect();
-        const touch = e.touches ? e.touches[0] : e;
-        const mx = touch.clientX - rect.left;
-        const my = touch.clientY - rect.top;
+        // PointerEvent has clientX/Y directly; touch events put it in touches[0]
+        const src = e.touches ? e.touches[0] : e;
+        const mx = src.clientX - rect.left;
+        const my = src.clientY - rect.top;
         const cx = area.clientWidth / 2;
         const cy = area.clientHeight / 2;
         const dx = mx - cx, dy = my - cy;
@@ -2758,8 +2748,14 @@
         lastAngle = newAngle;
       }
 
+      // Pointer events unify mouse + touch + pen. pointerdown primes lastAngle
+      // on first contact so the very next move counts.
+      const primeMove = (e) => { lastAngle = null; handleMove(e); };
+      area.addEventListener('pointerdown', primeMove);
+      area.addEventListener('pointermove', handleMove);
+      // Keep the old listeners too for any browser that falls back
       area.addEventListener('mousemove', handleMove);
-      area.addEventListener('touchmove', (e) => { e.preventDefault(); handleMove(e); }, { passive: false });
+      area.addEventListener('touchmove', handleMove, { passive: false });
 
       const agreeBtn = document.getElementById('vow-agree');
       if (agreeBtn && !agreeBtn.dataset.wired) {
