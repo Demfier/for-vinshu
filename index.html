@@ -1533,28 +1533,24 @@
         <div class="scroll-ornament">⸻ ❦ ⸻</div>
       </div>
       <div class="letter fade-in" style="animation-delay: 1s">
-        <!-- EDIT THIS LETTER TO MAKE IT YOUR OWN -->
         <p>
           I wish more than anything that I could be there today — to hug you,
-          to dance with you, to cry a little when you walked out to the pheras.
-          The world got in the way of the plane ticket, but not of this.
+          to dance with you.
         </p>
         <p>
           Watching you become someone's whole world is only surprising to the people
-          who don't already know you. I've known you my entire life, and I've been
+          who don't already know you. I've known you since childhood and I've been
           quietly watching you become extraordinary the whole time.
         </p>
         <p>
-          May your marriage be full of the small, ordinary kinds of joy —
-          bad jokes, shared chai, the fights you laugh about later. May he love
-          you the way you deserve, which is to say, completely.
+          May your marriage be full of the big &amp; small, ordinary &amp; extraordinary moments of joy.
+          May you be each other's best friends, cheerleaders, and biggest supporters.
+          May he love you the way you deserve, which is to say, completely.
         </p>
         <p>
-          I love you. I love you. I love you.<br>
-          No distance is long enough to change that.
+          God bless you both.
         </p>
-        <div class="signature">— your sibling, always</div>
-        <!-- END OF LETTER -->
+        <div class="signature">— Gaurav</div>
       </div>
       <div class="fade-in" style="animation-delay: 2.5s; margin-top: 24px;">
         <div class="ornament">✦</div>
@@ -1653,9 +1649,22 @@
     /* =================== STAGE 1: HALDI =================== */
     const HALDI_TARGET = 16;
     const HALDI_ITEMS = ['🌼', '🌻', '🌸', '💛', '✨', '🌺'];
+    // Happy chime per catch — C major scale climbing, then a bright octave Sa at the end
+    const HALDI_CHIME_SCALE = [
+      523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50,
+      1174.66, 1318.51, 1396.91, 1567.98, 1760.00, 1975.53, 2093.00, 2349.32,
+    ];
     let haldiScore = 0;
     let haldiActive = false;
     let haldiInterval = null;
+
+    function playHaldiChime(catchNumber) {
+      const idx = Math.min(Math.max(catchNumber - 1, 0), HALDI_CHIME_SCALE.length - 1);
+      const freq = HALDI_CHIME_SCALE[idx];
+      // Bell-like triangle + soft sine shimmer one octave up
+      playTone(freq, 0.42, 0, 0.18, 'triangle');
+      playTone(freq * 2, 0.28, 0, 0.05, 'sine');
+    }
 
     function startHaldi() {
       haldiScore = 0;
@@ -1700,6 +1709,7 @@
           el.dataset.caught = 'true';
           haldiScore++;
           document.getElementById('haldi-score').textContent = haldiScore;
+          playHaldiChime(haldiScore);
           flyToBasket(el, area);
 
           if (haldiScore >= HALDI_TARGET) {
@@ -1854,115 +1864,286 @@
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, MEHNDI_SIZE, MEHNDI_SIZE);
 
-      // Henna mandala underneath — rich brown so it pops when revealed
       const HENNA = '#6b2f14';
-      const HENNA_SOFT = 'rgba(107, 47, 20, 0.55)';
+      const HENNA_MED = '#8b3a1f';
+      const HENNA_SOFT = 'rgba(107, 47, 20, 0.5)';
+      const HENNA_FAINT = 'rgba(107, 47, 20, 0.32)';
+
       ctx.strokeStyle = HENNA;
       ctx.fillStyle = HENNA;
-      ctx.lineWidth = 1.6;
       ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
 
-      // Center six-petal lotus
+      // ---------- CENTER: dot + 8-point starburst ----------
+      ctx.lineWidth = 1.1;
       ctx.beginPath();
-      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
-      ctx.stroke();
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2;
-        const px = cx + Math.cos(a) * 14;
-        const py = cy + Math.sin(a) * 14;
+      ctx.arc(cx, cy, 2.6, 0, Math.PI * 2);
+      ctx.fill();
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * 4, cy + Math.sin(a) * 4);
+        ctx.lineTo(cx + Math.cos(a) * 8, cy + Math.sin(a) * 8);
+        ctx.stroke();
+      }
+
+      // ---------- INNER LOTUS (r ≈ 10–24): 8 main + 8 interleaved petals ----------
+      ctx.lineWidth = 1.4;
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
         ctx.save();
-        ctx.translate(px, py);
+        ctx.translate(cx + Math.cos(a) * 15, cy + Math.sin(a) * 15);
         ctx.rotate(a + Math.PI / 2);
         ctx.beginPath();
-        ctx.ellipse(0, 0, 5, 13, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, 4, 11, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, 3, 0.9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.strokeStyle = HENNA_MED;
+      ctx.lineWidth = 0.95;
+      for (let i = 0; i < 8; i++) {
+        const a = ((i + 0.5) / 8) * Math.PI * 2;
+        ctx.save();
+        ctx.translate(cx + Math.cos(a) * 17, cy + Math.sin(a) * 17);
+        ctx.rotate(a + Math.PI / 2);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 2, 6, 0, 0, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
       }
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6 + 1 / 12) * Math.PI * 2;
+      ctx.strokeStyle = HENNA;
+
+      // ---------- RING 1 (r=30) with 12 rosettes on the ring ----------
+      ctx.lineWidth = 0.9;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+      ctx.stroke();
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        const px = cx + Math.cos(a) * 30;
+        const py = cy + Math.sin(a) * 30;
         ctx.beginPath();
-        ctx.arc(cx + Math.cos(a) * 22, cy + Math.sin(a) * 22, 1.8, 0, Math.PI * 2);
+        ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(px, py, 0.8, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Ring 1
-      ctx.beginPath();
-      ctx.arc(cx, cy, 42, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Paisley ring (12 mangoes)
+      // ---------- VINE RAYS (r 34–50): 12 S-shaped vines with bud tips ----------
+      ctx.lineWidth = 1.1;
       for (let i = 0; i < 12; i++) {
         const a = (i / 12) * Math.PI * 2;
-        const px = cx + Math.cos(a) * 62;
-        const py = cy + Math.sin(a) * 62;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(a);
+        ctx.beginPath();
+        ctx.moveTo(0, -34);
+        ctx.bezierCurveTo(5, -38, 5, -46, 0, -49);
+        ctx.bezierCurveTo(-5, -46, -5, -38, 0, -34);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, -51, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // ---------- RING 2 (r=56) ----------
+      ctx.lineWidth = 0.9;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 56, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // ---------- DETAILED PAISLEY RING (r=72): 12 ornate mangoes ----------
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        const px = cx + Math.cos(a) * 72;
+        const py = cy + Math.sin(a) * 72;
         ctx.save();
         ctx.translate(px, py);
         ctx.rotate(a + Math.PI);
+        // Outer teardrop
+        ctx.lineWidth = 1.4;
         ctx.beginPath();
-        ctx.moveTo(0, -14);
-        ctx.bezierCurveTo(9, -10, 8, 8, 0, 14);
-        ctx.bezierCurveTo(-8, 8, -9, -10, 0, -14);
+        ctx.moveTo(0, -16);
+        ctx.bezierCurveTo(11, -11, 10, 10, 0, 17);
+        ctx.bezierCurveTo(-10, 10, -11, -11, 0, -16);
+        ctx.stroke();
+        // Larger inner curl
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, -11);
+        ctx.bezierCurveTo(6, -8, 6, 6, 0, 10);
+        ctx.stroke();
+        // Smaller inner curl
+        ctx.beginPath();
+        ctx.moveTo(0, -6);
+        ctx.bezierCurveTo(3, -4, 3, 3, 0, 5);
+        ctx.stroke();
+        // Tip ornament — 3 dots
+        ctx.beginPath(); ctx.arc(0, -19, 1.1, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(-2.2, -20.5, 0.7, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(2.2, -20.5, 0.7, 0, Math.PI * 2); ctx.fill();
+        // Tiny base leaves
+        ctx.strokeStyle = HENNA_MED;
+        ctx.lineWidth = 0.9;
+        ctx.beginPath();
+        ctx.moveTo(-3, 16);
+        ctx.quadraticCurveTo(-5, 19, -7, 17);
         ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(0, -10);
-        ctx.bezierCurveTo(5, -8, 5, 4, 0, 8);
+        ctx.moveTo(3, 16);
+        ctx.quadraticCurveTo(5, 19, 7, 17);
         ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(0, -16, 1.6, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.strokeStyle = HENNA;
         ctx.restore();
       }
-
-      // Ring 2
-      ctx.strokeStyle = HENNA_SOFT;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 92, 0, Math.PI * 2);
-      ctx.stroke();
+      // Vine-fleuret between every paisley pair
+      ctx.strokeStyle = HENNA_MED;
+      for (let i = 0; i < 12; i++) {
+        const a = ((i + 0.5) / 12) * Math.PI * 2;
+        const px = cx + Math.cos(a) * 78;
+        const py = cy + Math.sin(a) * 78;
+        ctx.lineWidth = 0.9;
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(px, py, 0.7, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.strokeStyle = HENNA;
 
-      // Scalloped arches (16 small circles with dots)
+      // ---------- DOUBLE-RING BAND (r=90, 94) + 36 dots between ----------
+      ctx.lineWidth = 0.75;
+      ctx.strokeStyle = HENNA_SOFT;
+      ctx.beginPath(); ctx.arc(cx, cy, 90, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, 94, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = HENNA;
+      for (let i = 0; i < 36; i++) {
+        const a = (i / 36) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * 92, cy + Math.sin(a) * 92, 0.85, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // ---------- MEDALLION RING (r=112): 16 fancy medallions ----------
       for (let i = 0; i < 16; i++) {
         const a = (i / 16) * Math.PI * 2;
         const px = cx + Math.cos(a) * 112;
         const py = cy + Math.sin(a) * 112;
+        // Outer medallion circle
+        ctx.lineWidth = 1.1;
         ctx.beginPath();
-        ctx.arc(px, py, 9, 0, Math.PI * 2);
+        ctx.arc(px, py, 8, 0, Math.PI * 2);
         ctx.stroke();
+        // Inner 4-petal flower
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate(a);
+        for (let j = 0; j < 4; j++) {
+          const pa = (j / 4) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.ellipse(Math.cos(pa) * 2.5, Math.sin(pa) * 2.5, 1.4, 3.5, pa + Math.PI / 2, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        // Center dot
         ctx.beginPath();
-        ctx.arc(px, py, 1.6, 0, Math.PI * 2);
+        ctx.arc(0, 0, 1, 0, Math.PI * 2);
         ctx.fill();
+        ctx.restore();
+        // 6 dots orbiting outside
+        for (let j = 0; j < 6; j++) {
+          const pa = (j / 6) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.arc(px + Math.cos(pa) * 10.5, py + Math.sin(pa) * 10.5, 0.65, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
-
-      // Ring 3
-      ctx.strokeStyle = HENNA_SOFT;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 132, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.strokeStyle = HENNA;
-
-      // Outer leaf ring (24 teardrop leaves)
-      for (let i = 0; i < 24; i++) {
-        const a = (i / 24) * Math.PI * 2;
-        const px = cx + Math.cos(a) * 150;
-        const py = cy + Math.sin(a) * 150;
+      // Curlicues between medallions
+      ctx.strokeStyle = HENNA_MED;
+      ctx.lineWidth = 0.9;
+      for (let i = 0; i < 16; i++) {
+        const a = ((i + 0.5) / 16) * Math.PI * 2;
+        const px = cx + Math.cos(a) * 112;
+        const py = cy + Math.sin(a) * 112;
         ctx.save();
         ctx.translate(px, py);
         ctx.rotate(a + Math.PI / 2);
         ctx.beginPath();
-        ctx.moveTo(0, -10);
-        ctx.bezierCurveTo(4, -5, 4, 5, 0, 10);
-        ctx.bezierCurveTo(-4, 5, -4, -5, 0, -10);
+        ctx.moveTo(-4, 0);
+        ctx.quadraticCurveTo(0, -4, 4, 0);
+        ctx.quadraticCurveTo(0, 4, -4, 0);
         ctx.stroke();
         ctx.restore();
       }
+      ctx.strokeStyle = HENNA;
 
-      // Dot ring (36 dots)
-      for (let i = 0; i < 36; i++) {
-        const a = (i / 36) * Math.PI * 2;
+      // ---------- RING 3 (r=128) ----------
+      ctx.lineWidth = 0.85;
+      ctx.strokeStyle = HENNA_SOFT;
+      ctx.beginPath(); ctx.arc(cx, cy, 128, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = HENNA;
+
+      // ---------- LEAF GARLAND (r=142): 24 leaves with veins + buds ----------
+      for (let i = 0; i < 24; i++) {
+        const a = (i / 24) * Math.PI * 2;
+        const px = cx + Math.cos(a) * 142;
+        const py = cy + Math.sin(a) * 142;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate(a + Math.PI / 2);
+        ctx.lineWidth = 1.1;
         ctx.beginPath();
-        ctx.arc(cx + Math.cos(a) * 168, cy + Math.sin(a) * 168, 1.8, 0, Math.PI * 2);
+        ctx.moveTo(0, -9);
+        ctx.bezierCurveTo(5, -5, 5, 5, 0, 9);
+        ctx.bezierCurveTo(-5, 5, -5, -5, 0, -9);
+        ctx.stroke();
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(0, -7);
+        ctx.lineTo(0, 7);
+        ctx.stroke();
+        ctx.restore();
+      }
+      for (let i = 0; i < 24; i++) {
+        const a = ((i + 0.5) / 24) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * 142, cy + Math.sin(a) * 142, 1.1, 0, Math.PI * 2);
         ctx.fill();
       }
+
+      // ---------- LAYERED DOT RINGS (r=156 / 164 / 172) ----------
+      ctx.fillStyle = HENNA;
+      for (let i = 0; i < 48; i++) {
+        const a = (i / 48) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * 156, cy + Math.sin(a) * 156, 1.15, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = HENNA_MED;
+      for (let i = 0; i < 36; i++) {
+        const a = (i / 36 + 0.5 / 36) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * 164, cy + Math.sin(a) * 164, 0.95, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = HENNA;
+      for (let i = 0; i < 72; i++) {
+        const a = (i / 72) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * 172, cy + Math.sin(a) * 172, 0.65, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // ---------- OUTERMOST FAINT RING (r=178) ----------
+      ctx.lineWidth = 0.55;
+      ctx.strokeStyle = HENNA_FAINT;
+      ctx.beginPath(); ctx.arc(cx, cy, 178, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = HENNA;
     }
 
     function drawMehndiMask(ctx) {
@@ -2329,13 +2510,13 @@
     let pherasActive = false;
 
     const VOWS = [
-      'With this step, we promise to share food and <b>nurture</b> each other.',
-      'With this step, we vow to grow in <b>strength</b> together.',
-      'With this step, we share our wealth and work for <b>prosperity</b>.',
-      'With this step, we promise to raise a <b>family</b> with love.',
-      "With this step, we care for each other's <b>health and happiness</b>.",
-      'With this step, we promise to be <b>best friends</b> for life.',
-      'With this step, we pledge love and <b>loyalty</b> through every lifetime.',
+      'With this step, you promise to share food and <b>nurture</b> each other.',
+      'With this step, you vow to grow in <b>strength</b> together.',
+      'With this step, you share your wealth and work for <b>prosperity</b>.',
+      'With this step, you promise to raise a <b>family</b> with love.',
+      "With this step, you care for each other's <b>health and happiness</b>.",
+      'With this step, you promise to be <b>best friends</b> for life.',
+      'With this step, you pledge love and <b>loyalty</b> through every lifetime.',
     ];
 
     function showVow(index) {
