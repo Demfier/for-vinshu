@@ -377,7 +377,7 @@
     }
 
     .note-beat .note-deva {
-      font-size: 1.35rem;
+      font-size: 1.85rem;
       line-height: 1;
       color: #3a1100;
     }
@@ -1719,22 +1719,44 @@
     let haldiActive = false;
     let haldiInterval = null;
 
-    // A soft bell — same gentle tone every time, for haldi catches and the
-    // flower shower. Sine wave, quick-soft attack, slow decay. No chirp.
+    // Gentle catch tone — slow swell + long sine decay. Softer than a bell.
     function playCatchSound() {
       const ctx = ensureAudio();
       if (!ctx) return;
       const t = ctx.currentTime;
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
-      osc.type = 'sine';                    // smoothest waveform
-      osc.frequency.setValueAtTime(880, t); // A5, bell-like, not piercing
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, t); // C5, warmer than A5
       g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(0.065, t + 0.03); // soft attack
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.45); // gentle decay
+      g.gain.linearRampToValueAtTime(0.045, t + 0.09); // slow swell — no onset click
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
       osc.connect(g).connect(ctx.destination);
       osc.start(t);
-      osc.stop(t + 0.5);
+      osc.stop(t + 0.75);
+    }
+
+    // Unique completion sound — staggered major-chord bloom. Plays once when
+    // solah shringar is complete (all 16 caught).
+    function playShringaarSound() {
+      const ctx = ensureAudio();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+      // C major open chord: Sa, Ga, Pa, Sa' (C4 E4 G4 C5)
+      const notes = [261.63, 329.63, 392.00, 523.25];
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        const offset = i * 0.08; // arpeggiated entry
+        g.gain.setValueAtTime(0, t + offset);
+        g.gain.linearRampToValueAtTime(0.055, t + offset + 0.15);
+        g.gain.exponentialRampToValueAtTime(0.001, t + offset + 1.5);
+        osc.connect(g).connect(ctx.destination);
+        osc.start(t + offset);
+        osc.stop(t + offset + 1.6);
+      });
     }
 
     function startHaldi() {
@@ -1841,6 +1863,7 @@
     function haldiVictory() {
       const bride = document.getElementById('haldi-bride');
       bride.classList.add('visible');
+      playShringaarSound();
       // Give the bride a moment to appear, then tip the basket and shower her
       setTimeout(throwFlowersAtBride, 650);
     }
@@ -2516,7 +2539,7 @@
       const el = document.createElement('div');
       el.className = 'note-beat n' + idx;
       el.dataset.noteIndex = idx;
-      el.innerHTML = '<span class="note-deva">' + note.deva + '</span><span class="note-latin">' + note.name + '</span>';
+      el.innerHTML = '<span class="note-deva">' + note.deva + '</span>';
       el.style.left = (6 + Math.random() * 84) + '%';
       el.style.top = '-60px';
       area.appendChild(el);
