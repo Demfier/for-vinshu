@@ -259,12 +259,13 @@
       pointer-events: auto;
       cursor: pointer;
       user-select: none;
-      transition: transform 0.15s ease;
       filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+      /* GPU-accelerated fall — keyframe on transform, not per-frame JS */
+      will-change: transform;
+      animation: falling-drop var(--fall-dur, 3s) linear forwards;
     }
-
-    .falling:hover {
-      transform: scale(1.2);
+    @keyframes falling-drop {
+      to { transform: translateY(var(--fall-dist, 420px)); }
     }
 
     .caught {
@@ -376,8 +377,12 @@
       justify-content: center;
       font-family: 'Cormorant Garamond', serif;
       font-weight: 600;
-      transition: transform 0.15s ease;
       box-shadow: 0 2px 8px rgba(139, 58, 31, 0.35), 0 0 18px rgba(139, 58, 31, 0.18);
+      will-change: transform;
+      animation: note-fall var(--note-dur, 3.5s) linear forwards;
+    }
+    @keyframes note-fall {
+      to { transform: translateY(var(--note-dist, 500px)); }
     }
 
     .note-beat .note-deva {
@@ -1064,6 +1069,18 @@
       pointer-events: none;
       z-index: 50;
       filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      will-change: transform;
+      animation: petal-fall var(--petal-dur, 8s) linear forwards;
+    }
+    @keyframes petal-fall {
+      from {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+      }
+      to {
+        transform:
+          translate3d(var(--petal-drift, 0px), calc(100vh + 60px), 0)
+          rotate(var(--petal-spin, 720deg));
+      }
     }
 
     /* ----------- DECORATIVE CORNERS ----------- */
@@ -1788,26 +1805,15 @@
         el.className = 'falling';
         el.textContent = HALDI_ITEMS[Math.floor(Math.random() * HALDI_ITEMS.length)];
         el.style.left = (4 + Math.random() * 88) + '%';
-        el.style.top = '-40px';
+        const duration = 2800 + Math.random() * 1600;
+        el.style.setProperty('--fall-dur', duration + 'ms');
+        el.style.setProperty('--fall-dist', (area.clientHeight + 60) + 'px');
         area.appendChild(el);
 
-        const duration = 2500 + Math.random() * 1500;
-        const startTime = Date.now();
-        const areaHeight = area.clientHeight;
-
-        function fall() {
-          if (!el.parentElement || el.dataset.caught) return;
-          const elapsed = Date.now() - startTime;
-          const progress = elapsed / duration;
-          if (progress >= 1) {
-            el.remove();
-            return;
-          }
-          // Don't fall past where the basket sits — let them drop off-bottom naturally
-          el.style.top = (progress * (areaHeight - 10) - 40) + 'px';
-          requestAnimationFrame(fall);
-        }
-        requestAnimationFrame(fall);
+        // When the fall finishes (uncaught), remove — no rAF loop, no per-frame layout
+        el.addEventListener('animationend', () => {
+          if (!el.dataset.caught) el.remove();
+        });
 
         el.addEventListener('click', () => {
           if (el.dataset.caught || !haldiActive) return;
@@ -1839,7 +1845,10 @@
       const targetX = basketRect.left - areaRect.left + basketRect.width / 2 - elRect.width / 2;
       const targetY = basketRect.top - areaRect.top + 4;
 
-      // Pin the element at its current visual position (stops the fall loop's top updates from mattering)
+      // Stop the CSS fall animation and pin at its current visual position
+      // so the basket-flight transform starts from a fresh baseline.
+      el.style.animation = 'none';
+      el.style.transform = 'none';
       el.style.left = startX + 'px';
       el.style.top = startY + 'px';
       el.style.pointerEvents = 'none';
@@ -2572,29 +2581,20 @@
       el.dataset.noteIndex = idx;
       el.innerHTML = '<span class="note-deva">' + note.deva + '</span>';
       el.style.left = (6 + Math.random() * 84) + '%';
-      el.style.top = '-60px';
+      const duration = 3400 + Math.random() * 1000;
+      el.style.setProperty('--note-dur', duration + 'ms');
+      el.style.setProperty('--note-dist', (area.clientHeight + 80) + 'px');
       area.appendChild(el);
 
-      const duration = 3200 + Math.random() * 900;
-      const startTime = Date.now();
-      const areaHeight = area.clientHeight;
-
-      function fall() {
-        if (!el.parentElement || el.dataset.caught) return;
-        const elapsed = Date.now() - startTime;
-        const progress = elapsed / duration;
-        if (progress >= 1) {
-          if (!el.dataset.caught && sangeetActive && parseInt(el.dataset.noteIndex) === noteIndex) {
-            sangeetMisses++;
-            flashMiss();
-          }
-          el.remove();
-          return;
+      // GPU-accelerated CSS fall; animationend handles the miss case
+      el.addEventListener('animationend', () => {
+        if (el.dataset.caught) return;
+        if (sangeetActive && parseInt(el.dataset.noteIndex) === noteIndex) {
+          sangeetMisses++;
+          flashMiss();
         }
-        el.style.top = (progress * (areaHeight + 60) - 60) + 'px';
-        requestAnimationFrame(fall);
-      }
-      requestAnimationFrame(fall);
+        el.remove();
+      });
 
       el.addEventListener('click', () => {
         if (el.dataset.caught || !sangeetActive) return;
@@ -2805,7 +2805,7 @@
     function startFinale() {
       // Gentle music beneath the letter
       startAmbient(AMBIENT_FINALE);
-      // Rain petals continuously
+      // Rain petals — CSS animation handles motion on the GPU
       const petals = ['🌸', '🌺', '🌼', '🌷', '💐', '❦', '✦'];
       setInterval(() => {
         const p = document.createElement('div');
@@ -2813,26 +2813,11 @@
         p.textContent = petals[Math.floor(Math.random() * petals.length)];
         p.style.left = (Math.random() * 100) + 'vw';
         p.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+        p.style.setProperty('--petal-dur', (6000 + Math.random() * 4000) + 'ms');
+        p.style.setProperty('--petal-drift', ((Math.random() - 0.5) * 200) + 'px');
+        p.style.setProperty('--petal-spin', (360 + Math.random() * 720) + 'deg');
         document.body.appendChild(p);
-        const duration = 6000 + Math.random() * 4000;
-        const drift = (Math.random() - 0.5) * 200;
-        const startTime = Date.now();
-        const startX = parseFloat(p.style.left);
-
-        function animate() {
-          if (!p.parentElement) return;
-          const elapsed = Date.now() - startTime;
-          const progress = elapsed / duration;
-          if (progress >= 1) {
-            p.remove();
-            return;
-          }
-          p.style.top = (progress * (window.innerHeight + 60) - 30) + 'px';
-          p.style.left = `calc(${startX}vw + ${drift * progress}px)`;
-          p.style.transform = `rotate(${progress * 720}deg)`;
-          requestAnimationFrame(animate);
-        }
-        requestAnimationFrame(animate);
+        p.addEventListener('animationend', () => p.remove());
       }, 280);
     }
 
