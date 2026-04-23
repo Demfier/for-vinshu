@@ -806,12 +806,14 @@
     /* Indian wedding couple (external SVG) */
     .couple {
       position: absolute;
+      left: 0;
+      top: 0;
       width: 110px;
       height: 89px;
-      transition: all 0.05s linear;
       filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.3));
       z-index: 3;
       pointer-events: none;
+      will-change: transform;
     }
 
     .couple .couple-img {
@@ -2682,22 +2684,20 @@
       const couple = document.getElementById('couple');
       const radius = 130;
 
+      let rafPending = false;
       function updateCouple() {
         const cx = area.clientWidth / 2;
         const cy = area.clientHeight / 2;
         const x = cx + Math.cos(pheraAngle) * radius - 55;
         const y = cy + Math.sin(pheraAngle) * radius - 44;
-        couple.style.left = x + 'px';
-        couple.style.top = y + 'px';
+        couple.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       }
       updateCouple();
 
       function handleMove(e) {
         if (!pherasActive) return;
-        // Prevent page-scroll while circling on touch devices
-        if (e.cancelable && e.type !== 'mousemove') e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         const rect = area.getBoundingClientRect();
-        // PointerEvent has clientX/Y directly; touch events put it in touches[0]
         const src = e.touches ? e.touches[0] : e;
         const mx = src.clientX - rect.left;
         const my = src.clientY - rect.top;
@@ -2705,24 +2705,29 @@
         const cy = area.clientHeight / 2;
         const dx = mx - cx, dy = my - cy;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        // Only count if near the orbit
-        if (dist < 60 || dist > 200) return;
+        // Ignore only the dead center (where atan2 is unstable); allow anywhere else
+        if (dist < 25) return;
 
         const newAngle = Math.atan2(dy, dx);
 
         if (lastAngle !== null) {
           let delta = newAngle - lastAngle;
-          // Normalize delta
           if (delta > Math.PI) delta -= 2 * Math.PI;
           if (delta < -Math.PI) delta += 2 * Math.PI;
 
-          // Only count forward motion (clockwise or counterclockwise, either is fine — pick one)
-          if (Math.abs(delta) < 0.5) {
+          // Accept fast flicks too; still drop teleports (>~100° per event)
+          if (Math.abs(delta) < 1.8) {
             angleAccumulator += delta;
             pheraAngle += delta;
-            updateCouple();
 
-            // Trail
+            if (!rafPending) {
+              rafPending = true;
+              requestAnimationFrame(() => {
+                rafPending = false;
+                updateCouple();
+              });
+            }
+
             const trail = document.createElement('div');
             trail.className = 'phera-trail';
             const tx = cx + Math.cos(pheraAngle) * radius - 3;
@@ -2732,15 +2737,11 @@
             area.appendChild(trail);
             setTimeout(() => trail.remove(), 1000);
 
-            // Check for full circle
             if (Math.abs(angleAccumulator) >= 2 * Math.PI) {
               angleAccumulator = 0;
               pheraCount++;
               document.getElementById('phera-count').textContent =
                 pheraCount >= 7 ? 'Seven vows, complete ✨' : 'Circle ' + (pheraCount + 1) + ' of 7';
-
-              // Show the vow just taken (pheraCount is 1..7, array is 0-indexed).
-              // showVow pauses pherasActive; acceptVow resumes or transitions.
               showVow(pheraCount - 1);
             }
           }
@@ -2748,14 +2749,22 @@
         lastAngle = newAngle;
       }
 
-      // Pointer events unify mouse + touch + pen. pointerdown primes lastAngle
-      // on first contact so the very next move counts.
-      const primeMove = (e) => { lastAngle = null; handleMove(e); };
-      area.addEventListener('pointerdown', primeMove);
+      // Pointer capture makes pointermove keep firing even if the finger
+      // slides past the edge of #pheras-area — previously those events were
+      // lost and the couple would stall mid-circle.
+      area.addEventListener('pointerdown', (e) => {
+        lastAngle = null;
+        try { area.setPointerCapture?.(e.pointerId); } catch (_) {}
+        handleMove(e);
+      });
       area.addEventListener('pointermove', handleMove);
-      // Keep the old listeners too for any browser that falls back
-      area.addEventListener('mousemove', handleMove);
-      area.addEventListener('touchmove', handleMove, { passive: false });
+      area.addEventListener('pointerup', (e) => {
+        lastAngle = null;
+        if (area.releasePointerCapture) {
+          try { area.releasePointerCapture(e.pointerId); } catch (_) {}
+        }
+      });
+      area.addEventListener('pointercancel', () => { lastAngle = null; });
 
       const agreeBtn = document.getElementById('vow-agree');
       if (agreeBtn && !agreeBtn.dataset.wired) {
