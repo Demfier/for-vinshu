@@ -1582,15 +1582,15 @@
           <img src="indian_bride_and_groom.svg" alt="" class="couple-img" draggable="false" />
         </div>
       </div>
-      <div class="score-display" style="margin-top:12px; font-style:italic;">Move your mouse or finger in circles around
-        the flame</div>
+      <div class="score-display" style="margin-top:12px; font-style:italic;">Guide the couple around the sacred fire
+      </div>
     </div>
 
     <!-- ============ FINALE ============ -->
     <div class="screen" id="finale">
       <div class="fade-in" style="animation-delay: 0.3s">
         <div class="ornament">✦ ❦ ✦</div>
-        <h1 class="finale-title">Vinshu, my love</h1>
+        <h1 class="finale-title">Dear Vinshu</h1>
         <div class="scroll-ornament">⸻ ❦ ⸻</div>
       </div>
       <div class="letter fade-in" style="animation-delay: 1s">
@@ -1702,6 +1702,10 @@
       intro.classList.add('active');
       // Replace click handler so the right stage starts when button is pressed
       btn.onclick = () => {
+        // Prime audio inside the actual user-gesture handler — autoplay policy
+        // needs a gesture to unlock the context, and the stage might try to
+        // start ambient music or effect sounds from a later setTimeout.
+        ensureAudio();
         intro.classList.remove('active');
         setTimeout(() => info.start(), 320);
       };
@@ -1710,21 +1714,25 @@
     /* =================== STAGE 1: HALDI =================== */
     const HALDI_TARGET = 16;
     const HALDI_ITEMS = ['🌼', '🌻', '🌸', '💛', '✨', '🌺'];
-    // Happy chime per catch — C major scale climbing, then a bright octave Sa at the end
-    const HALDI_CHIME_SCALE = [
-      523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50,
-      1174.66, 1318.51, 1396.91, 1567.98, 1760.00, 1975.53, 2093.00, 2349.32,
-    ];
     let haldiScore = 0;
     let haldiActive = false;
     let haldiInterval = null;
 
-    function playHaldiChime(catchNumber) {
-      const idx = Math.min(Math.max(catchNumber - 1, 0), HALDI_CHIME_SCALE.length - 1);
-      const freq = HALDI_CHIME_SCALE[idx];
-      // Bell-like triangle + soft sine shimmer one octave up
-      playTone(freq, 0.42, 0, 0.18, 'triangle');
-      playTone(freq * 2, 0.28, 0, 0.05, 'sine');
+    // One subtle sound, same every time — used for haldi catches and the final shower.
+    function playCatchSound() {
+      const ctx = ensureAudio();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(920, t);
+      osc.frequency.exponentialRampToValueAtTime(680, t + 0.09);
+      g.gain.setValueAtTime(0.14, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+      osc.connect(g).connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.22);
     }
 
     function startHaldi() {
@@ -1770,7 +1778,7 @@
           el.dataset.caught = 'true';
           haldiScore++;
           document.getElementById('haldi-score').textContent = haldiScore;
-          playHaldiChime(haldiScore);
+          playCatchSound();
           flyToBasket(el, area);
 
           if (haldiScore >= HALDI_TARGET) {
@@ -1880,6 +1888,7 @@
             f.style.top = (sy + dy) + 'px';
             f.style.transform = 'translate(0, 0)';
             f.classList.add('splat');
+            playCatchSound();
             setTimeout(() => f.remove(), 550);
           };
         }, i * 70);
@@ -2377,7 +2386,8 @@
 
       const master = ctx.createGain();
       master.gain.setValueAtTime(0, t);
-      master.gain.linearRampToValueAtTime(config.gain || 0.05, t + 2.5);
+      // Fade in over 1.2s so it becomes audible quickly but not abruptly
+      master.gain.linearRampToValueAtTime(config.gain || 0.08, t + 1.2);
       master.connect(ctx.destination);
 
       const oscillators = [];
@@ -2415,7 +2425,7 @@
           osc.start(mt);
           osc.stop(mt + dur + 0.1);
         };
-        setTimeout(playMelody, 900);
+        setTimeout(playMelody, 450);
         melodyTimer = setInterval(playMelody, intervalMs);
       }
 
@@ -2444,7 +2454,7 @@
       melodyInterval: 3.8,
       melodyDur: 1.8,
       melodyType: 'sine',
-      gain: 0.05,
+      gain: 0.11,
     };
 
     const AMBIENT_FINALE = {
@@ -2453,7 +2463,7 @@
       melodyInterval: 4.8,
       melodyDur: 2.2,
       melodyType: 'sine',
-      gain: 0.04,
+      gain: 0.09,
     };
 
     function updateSangeetUI() {
