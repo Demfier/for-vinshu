@@ -1,0 +1,7 @@
+# Debug screenshots from development
+*.png
+
+# Local testing artifacts
+.playwright-mcp/
+/tmp/
+.DS_Store

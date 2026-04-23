@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Vinshu, with love ✦</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Marcellus&family=Tangerine:wght@400;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --maroon: #6b1f2b;
+      --deep-maroon: #4a0e1a;
+      --marigold: #f4a825;
+      --deep-marigold: #e07a1f;
+      --gold: #d4a24c;
+      --cream: #fdf4e3;
+      --rose: #c44569;
+      --henna: #8b3a1f;
+      --ink: #2a0a0e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--ink);
+      background: var(--cream);
+    }
+
+    body {
+      background:
+        radial-gradient(ellipse at top, #fce5b8 0%, transparent 60%),
+        radial-gradient(ellipse at bottom right, #f4c2a1 0%, transparent 55%),
+        radial-gradient(ellipse at bottom left, #e8b4c3 0%, transparent 50%),
+        linear-gradient(180deg, #fdf4e3 0%, #f9e4c0 100%);
+      position: relative;
+    }
+
+    /* Decorative border pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 12px;
+      border: 2px solid var(--gold);
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 100;
+      box-shadow: inset 0 0 0 4px var(--cream), inset 0 0 0 5px var(--maroon);
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(244, 168, 37, 0.08) 0%, transparent 8%),
+        radial-gradient(circle at 80% 70%, rgba(196, 69, 105, 0.06) 0%, transparent 8%),
+        radial-gradient(circle at 50% 50%, rgba(212, 162, 76, 0.05) 0%, transparent 10%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #game {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Marcellus', serif;
+      color: var(--maroon);
+      letter-spacing: 0.02em;
+      text-align: center;
+    }
+
+    .ornament {
+      color: var(--gold);
+      font-size: 1.8rem;
+      letter-spacing: 0.5em;
+      margin: 12px 0;
+      text-align: center;
+      padding-left: 0.5em;
+    }
+
+    .title {
+      font-family: 'Tangerine', cursive;
+      font-size: clamp(3.5rem, 9vw, 6.5rem);
+      color: var(--maroon);
+      font-weight: 700;
+      line-height: 1;
+      text-shadow: 2px 2px 0 rgba(212, 162, 76, 0.3);
+    }
+
+    .subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      color: var(--henna);
+      margin: 8px 0 4px;
+      font-weight: 400;
+    }
+
+    .stage-name {
+      font-family: 'Marcellus', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      color: var(--maroon);
+      margin-bottom: 6px;
+    }
+
+    .stage-hindi {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--deep-marigold);
+      letter-spacing: 0.15em;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .instruction {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      color: var(--ink);
+      max-width: 520px;
+      text-align: center;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    button {
+      font-family: 'Marcellus', serif;
+      background: var(--maroon);
+      color: var(--cream);
+      border: none;
+      padding: 14px 36px;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      box-shadow: 0 4px 0 var(--deep-maroon), 0 6px 16px rgba(74, 14, 26, 0.3);
+      position: relative;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 var(--deep-maroon), 0 10px 20px rgba(74, 14, 26, 0.4);
+    }
+
+    button:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 var(--deep-maroon), 0 3px 8px rgba(74, 14, 26, 0.3);
+    }
+
+    .hud {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Marcellus', serif;
+      color: var(--maroon);
+      font-size: 1rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: rgba(253, 244, 227, 0.85);
+      padding: 8px 20px;
+      border: 1px solid var(--gold);
+      border-radius: 2px;
+    }
+
+    .progress-dots {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(107, 31, 43, 0.2);
+      border: 1px solid var(--maroon);
+      transition: all 0.4s ease;
+    }
+
+    .dot.done {
+      background: var(--marigold);
+      box-shadow: 0 0 8px var(--marigold);
+    }
+
+    .dot.current {
+      background: var(--maroon);
+      transform: scale(1.3);
+    }
+
+    /* ----------- STAGE 1: HALDI ----------- */
+    #haldi-area {
+      position: relative;
+      width: min(520px, 92vw);
+      height: 420px;
+      background:
+        radial-gradient(ellipse at center, rgba(244, 168, 37, 0.15), transparent 70%);
+      border: 1px dashed var(--gold);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    .falling {
+      position: absolute;
+      top: -40px;
+      font-size: 2rem;
+      pointer-events: auto;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.15s ease;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+    }
+
+    .falling:hover {
+      transform: scale(1.2);
+    }
+
+    .caught {
+      animation: poof 0.4s ease-out forwards;
+    }
+
+    @keyframes poof {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1.8);
+        opacity: 0;
+      }
+    }
+
+    .score-display {
+      font-family: 'Marcellus', serif;
+      font-size: 1.2rem;
+      color: var(--deep-marigold);
+      margin-top: 16px;
+      letter-spacing: 0.1em;
+    }
+
+    /* ----------- STAGE 2: MEHNDI (layered canvas, tap-to-reveal) ----------- */
+    .mehndi-wrap {
+      position: relative;
+      width: 360px;
+      height: 360px;
+    }
+
+    #mehndi-base,
+    #mehndi-mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1px solid var(--gold);
+      box-shadow: inset 0 0 40px rgba(212, 162, 76, 0.2), 0 10px 30px rgba(107, 31, 43, 0.15);
+    }
+
+    #mehndi-base { z-index: 1; }
+
+    #mehndi-mask {
+      cursor: pointer;
+      touch-action: none;
+      z-index: 2;
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    .mehndi-progress {
+      position: absolute;
+      bottom: -36px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      color: var(--henna);
+      font-size: 1.1rem;
+      white-space: nowrap;
+    }
+
+    /* ----------- STAGE 3: SANGEET ----------- */
+    #sangeet-area {
+      position: relative;
+      width: min(520px, 92vw);
+      height: 420px;
+      background: linear-gradient(180deg, #4a0e1a 0%, #6b1f2b 100%);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--gold);
+      box-shadow: 0 10px 40px rgba(74, 14, 26, 0.4);
+    }
+
+    /* Sangeet — saat sur note beats */
+    .sangeet-next {
+      font-family: 'Marcellus', serif;
+    }
+    .sangeet-next strong {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2em;
+      color: var(--marigold);
+      margin-right: 4px;
+    }
+    .note-beat {
+      position: absolute;
+      top: -60px;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      transition: transform 0.15s ease;
+      box-shadow: 0 0 14px rgba(244,168,37,0.6), 0 0 28px rgba(244,168,37,0.35);
+    }
+    .note-beat .note-deva {
+      font-size: 1.35rem;
+      line-height: 1;
+      color: #3a1100;
+    }
+    .note-beat .note-latin {
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      color: rgba(58, 17, 0, 0.75);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .note-beat:hover { transform: scale(1.12); }
+    .note-beat.caught {
+      animation: noteCaught 0.55s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes noteCaught {
+      0%   { transform: scale(1); opacity: 1; }
+      40%  { transform: scale(1.6); opacity: 0.9; }
+      100% { transform: scale(0.45); opacity: 0; }
+    }
+    /* Each note color-coded through a warm-to-cool gradient so they feel distinct */
+    .note-beat.n0 { background: radial-gradient(circle, #ffd25e 0%, #c78400 88%); }
+    .note-beat.n1 { background: radial-gradient(circle, #ffb347 0%, #a85a10 88%); }
+    .note-beat.n2 { background: radial-gradient(circle, #ff7e2e 0%, #a8390d 88%); }
+    .note-beat.n3 { background: radial-gradient(circle, #ff5a6b 0%, #8a1a28 88%); }
+    .note-beat.n4 { background: radial-gradient(circle, #e63aa5 0%, #6b1a5a 88%); }
+    .note-beat.n5 { background: radial-gradient(circle, #a86be0 0%, #3a1065 88%); }
+    .note-beat.n6 { background: radial-gradient(circle, #6baeff 0%, #0c3a85 88%); }
+    .note-beat.n5 .note-deva,
+    .note-beat.n6 .note-deva { color: #fff5e0; }
+    .note-beat.n5 .note-latin,
+    .note-beat.n6 .note-latin { color: rgba(255,245,224,0.8); }
+
+    .hit-flash {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 75%, rgba(244, 168, 37, 0.4), transparent 40%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .miss-flash {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 75%, rgba(196, 69, 105, 0.4), transparent 40%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes flash {
+      0% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .sangeet-status {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Marcellus', serif;
+      color: var(--cream);
+      font-size: 0.95rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* ----------- STAGE 4: PHERAS ----------- */
+    #pheras-area {
+      position: relative;
+      width: min(520px, 92vw);
+      height: 420px;
+      background:
+        radial-gradient(ellipse at center, rgba(255, 200, 100, 0.2), transparent 60%);
+      border: 1px dashed var(--gold);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* Havan kund — sacred fire pit */
+    .sacred-fire {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(0.78);
+      transform-origin: center center;
+      width: 170px;
+      height: 160px;
+      pointer-events: none;
+      filter: drop-shadow(0 0 30px rgba(255, 130, 0, 0.55));
+    }
+
+    .kund-base {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 48px;
+      background:
+        linear-gradient(180deg, #8b4513 0%, #5a2b0e 55%, #2d1505 100%);
+      clip-path: polygon(8% 0%, 92% 0%,
+          100% 35%, 100% 90%,
+          92% 100%, 8% 100%,
+          0 90%, 0 35%);
+      box-shadow: 0 -3px 24px rgba(255, 100, 0, 0.6), inset 0 -6px 10px rgba(0, 0, 0, 0.45);
+    }
+
+    .kund-base::before {
+      /* brick seams */
+      content: '';
+      position: absolute;
+      inset: 10px 10px 6px 10px;
+      background:
+        repeating-linear-gradient(90deg,
+          rgba(50, 20, 5, 0.55) 0 1px, transparent 1px 26px),
+        repeating-linear-gradient(180deg,
+          rgba(50, 20, 5, 0.55) 0 1px, transparent 1px 14px);
+      opacity: 0.8;
+      border-radius: 4px;
+    }
+
+    .kund-base::after {
+      /* top lip / rim */
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 8%;
+      right: 8%;
+      height: 6px;
+      background: linear-gradient(180deg, #9b5a27, #4a230c);
+      border-radius: 3px;
+    }
+
+    .kund-rim {
+      /* upper opening of the kund */
+      position: absolute;
+      bottom: 42px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 130px;
+      height: 14px;
+      background: radial-gradient(ellipse at center, #1a0a03 0%, #401e08 60%, #7a3c10 100%);
+      border-radius: 50%;
+      box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.8), 0 -1px 10px rgba(255, 100, 0, 0.5);
+    }
+
+    .flame-pod {
+      position: absolute;
+      bottom: 48px;
+    }
+
+    .flame-pod.left {
+      left: 28%;
+      transform: translateX(-50%);
+    }
+
+    .flame-pod.center {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .flame-pod.right {
+      left: 72%;
+      transform: translateX(-50%);
+    }
+
+    .flame-pod .flame {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      border-radius: 50% 50% 35% 35% / 60% 60% 40% 40%;
+      transform-origin: bottom center;
+      filter: blur(0.9px);
+    }
+
+    /* Center flame — tall and bright */
+    .flame-pod.center .flame.outer {
+      width: 60px;
+      height: 100px;
+      background: radial-gradient(ellipse at center bottom, #ff3d00 0%, #ff6b1a 45%, rgba(255, 107, 26, 0.12) 90%, transparent);
+      transform: translateX(-50%);
+      animation: flickerCenterOuter 1.3s ease-in-out infinite alternate;
+    }
+
+    .flame-pod.center .flame.mid {
+      width: 36px;
+      height: 72px;
+      background: radial-gradient(ellipse at center bottom, #ffab00 0%, #ffd54f 55%, transparent);
+      transform: translateX(-50%);
+      animation: flickerCenterMid 0.9s ease-in-out infinite alternate;
+    }
+
+    .flame-pod.center .flame.inner {
+      width: 16px;
+      height: 42px;
+      background: radial-gradient(ellipse at center bottom, #fffae5 0%, #ffd54f 60%, transparent);
+      transform: translateX(-50%);
+      animation: flickerCenterInner 0.5s ease-in-out infinite alternate;
+    }
+
+    /* Side flames — shorter, offset timing */
+    .flame-pod.left .flame.outer,
+    .flame-pod.right .flame.outer {
+      width: 42px;
+      height: 70px;
+      background: radial-gradient(ellipse at center bottom, #ff5a1a 0%, #ff8c40 45%, transparent);
+      transform: translateX(-50%);
+      animation: flickerSideOuter 1.1s ease-in-out infinite alternate;
+    }
+
+    .flame-pod.left .flame.mid,
+    .flame-pod.right .flame.mid {
+      width: 24px;
+      height: 46px;
+      background: radial-gradient(ellipse at center bottom, #ffb347 0%, #ffd54f 55%, transparent);
+      transform: translateX(-50%);
+      animation: flickerSideMid 0.75s ease-in-out infinite alternate;
+    }
+
+    .flame-pod.right .flame.outer {
+      animation-delay: -0.4s;
+    }
+
+    .flame-pod.right .flame.mid {
+      animation-delay: -0.3s;
+    }
+
+    @keyframes flickerCenterOuter {
+      0% {
+        transform: translateX(-50%) scaleY(0.96) scaleX(1.04);
+      }
+
+      100% {
+        transform: translateX(-52%) scaleY(1.06) scaleX(0.95);
+      }
+    }
+
+    @keyframes flickerCenterMid {
+      0% {
+        transform: translateX(-48%) scaleY(1.0) scaleX(0.97);
+      }
+
+      100% {
+        transform: translateX(-53%) scaleY(1.09) scaleX(1.03);
+      }
+    }
+
+    @keyframes flickerCenterInner {
+      0% {
+        transform: translateX(-50%) scaleY(0.9);
+      }
+
+      100% {
+        transform: translateX(-50%) scaleY(1.15);
+      }
+    }
+
+    @keyframes flickerSideOuter {
+      0% {
+        transform: translateX(-48%) scaleY(0.92) scaleX(1.06);
+      }
+
+      100% {
+        transform: translateX(-52%) scaleY(1.08) scaleX(0.95);
+      }
+    }
+
+    @keyframes flickerSideMid {
+      0% {
+        transform: translateX(-50%) scaleY(0.94);
+      }
+
+      100% {
+        transform: translateX(-50%) scaleY(1.1);
+      }
+    }
+
+    /* Smoke curls */
+    .smoke {
+      position: absolute;
+      bottom: 110px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(90, 90, 90, 0.28);
+      filter: blur(6px);
+      opacity: 0;
+      animation: smokeRise 4.5s linear infinite;
+    }
+
+    .smoke.s1 {
+      left: 42%;
+      animation-delay: 0s;
+    }
+
+    .smoke.s2 {
+      left: 50%;
+      animation-delay: 1.5s;
+    }
+
+    .smoke.s3 {
+      left: 56%;
+      animation-delay: 3s;
+    }
+
+    @keyframes smokeRise {
+      0% {
+        bottom: 100px;
+        opacity: 0;
+        transform: scale(0.5) translateX(0);
+      }
+
+      15% {
+        opacity: 0.55;
+      }
+
+      100% {
+        bottom: 190px;
+        opacity: 0;
+        transform: scale(2) translateX(18px);
+      }
+    }
+
+    /* Embers */
+    .sacred-fire .ember {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #ffcc66;
+      box-shadow: 0 0 6px #ffab00, 0 0 12px rgba(255, 171, 0, 0.6);
+      opacity: 0;
+      animation: emberRise 2.4s ease-out infinite;
+    }
+
+    .sacred-fire .ember.e1 {
+      left: 34%;
+      animation-delay: 0s;
+    }
+
+    .sacred-fire .ember.e2 {
+      left: 50%;
+      animation-delay: 0.5s;
+    }
+
+    .sacred-fire .ember.e3 {
+      left: 44%;
+      animation-delay: 1s;
+    }
+
+    .sacred-fire .ember.e4 {
+      left: 58%;
+      animation-delay: 1.6s;
+    }
+
+    .sacred-fire .ember.e5 {
+      left: 40%;
+      animation-delay: 2.1s;
+    }
+
+    @keyframes emberRise {
+      0% {
+        bottom: 62px;
+        opacity: 0;
+        transform: translateX(0);
+      }
+
+      15% {
+        opacity: 1;
+      }
+
+      100% {
+        bottom: 160px;
+        opacity: 0;
+        transform: translateX(10px);
+      }
+    }
+
+    /* Indian wedding couple (external SVG) */
+    .couple {
+      position: absolute;
+      width: 110px;
+      height: 89px;
+      transition: all 0.05s linear;
+      filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.3));
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .couple .couple-img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Devanagari subtitle on each stage */
+    .stage-devanagari {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.1rem, 2.3vw, 1.35rem);
+      color: var(--henna);
+      font-style: italic;
+      margin: -4px 0 18px;
+      opacity: 0.85;
+      letter-spacing: 0.02em;
+      text-align: center;
+    }
+
+    /* Sangeet beat pulse (on top of existing .beat) */
+    .beat {
+      animation: beatPulse 1.1s ease-in-out infinite alternate;
+    }
+
+    .beat.caught {
+      animation: poof 0.4s ease-out forwards;
+    }
+
+    @keyframes beatPulse {
+      0% {
+        box-shadow: 0 0 14px var(--marigold), 0 0 28px rgba(244, 168, 37, 0.45);
+      }
+
+      100% {
+        box-shadow: 0 0 26px var(--marigold), 0 0 52px rgba(244, 168, 37, 0.8);
+      }
+    }
+
+    /* Welcome rotating mandala backdrop */
+    .mandala-bg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0.12;
+      z-index: 0;
+    }
+
+    .mandala-bg svg {
+      width: min(520px, 80vmin);
+      height: min(520px, 80vmin);
+      animation: mandalaSpin 80s linear infinite;
+    }
+
+    @keyframes mandalaSpin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #welcome>.fade-in {
+      position: relative;
+      z-index: 1;
+    }
+
+    .phera-trail {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--marigold);
+      box-shadow: 0 0 8px var(--marigold);
+      pointer-events: none;
+      animation: fadeOut 1s ease-out forwards;
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      to {
+        opacity: 0;
+        transform: scale(0.3);
+      }
+    }
+
+    .phera-count {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Marcellus', serif;
+      color: var(--maroon);
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: rgba(253, 244, 227, 0.9);
+      padding: 6px 16px;
+      border-radius: 2px;
+      border: 1px solid var(--gold);
+      z-index: 4;
+    }
+
+    .vow-display {
+      position: absolute;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px) scale(0.92);
+      width: min(440px, 86%);
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--maroon);
+      text-align: center;
+      background: rgba(253, 244, 227, 0.97);
+      padding: 16px 22px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--gold);
+      box-shadow: 0 8px 28px rgba(107, 31, 43, 0.28), 0 0 0 3px rgba(244, 168, 37, 0.1);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
+      z-index: 10;
+    }
+
+    .vow-display.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .vow-text {
+      font-style: italic;
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      line-height: 1.5;
+    }
+
+    .vow-text::before,
+    .vow-text::after {
+      content: '❦';
+      color: var(--gold);
+      opacity: 0.7;
+      font-size: 0.85em;
+      margin: 0 0.5em;
+      vertical-align: middle;
+    }
+
+    .vow-agree {
+      margin-top: 14px;
+      font-family: 'Marcellus', serif;
+      background: var(--maroon);
+      color: var(--cream);
+      border: none;
+      padding: 9px 26px;
+      font-size: 0.8rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      box-shadow: 0 3px 0 var(--deep-maroon), 0 4px 10px rgba(74, 14, 26, 0.25);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .vow-agree:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 var(--deep-maroon), 0 6px 14px rgba(74, 14, 26, 0.3);
+    }
+    .vow-agree:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--deep-maroon), 0 2px 6px rgba(74, 14, 26, 0.25);
+    }
+
+    /* ----------- FINALE ----------- */
+    #finale {
+      background:
+        radial-gradient(ellipse at center, rgba(253, 244, 227, 0.95), rgba(253, 244, 227, 0.85));
+    }
+
+    .finale-title {
+      font-family: 'Tangerine', cursive;
+      font-size: clamp(4rem, 11vw, 7.5rem);
+      color: var(--maroon);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 0 rgba(212, 162, 76, 0.3);
+    }
+
+    .letter {
+      max-width: 560px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+      line-height: 1.8;
+      color: var(--ink);
+      text-align: center;
+      padding: 0 24px;
+      font-style: italic;
+    }
+
+    .letter p {
+      margin-bottom: 1.2em;
+    }
+
+    .signature {
+      font-family: 'Tangerine', cursive;
+      font-size: 2.8rem;
+      color: var(--maroon);
+      margin-top: 8px;
+      font-weight: 700;
+    }
+
+    .petal {
+      position: fixed;
+      top: -30px;
+      font-size: 1.5rem;
+      pointer-events: none;
+      z-index: 50;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    /* ----------- DECORATIVE CORNERS ----------- */
+    .corner {
+      position: fixed;
+      width: 80px;
+      height: 80px;
+      z-index: 99;
+      pointer-events: none;
+      color: var(--gold);
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .corner.tl {
+      top: 20px;
+      left: 20px;
+    }
+
+    .corner.tr {
+      top: 20px;
+      right: 20px;
+      transform: scaleX(-1);
+    }
+
+    .corner.bl {
+      bottom: 20px;
+      left: 20px;
+      transform: scaleY(-1);
+    }
+
+    .corner.br {
+      bottom: 20px;
+      right: 20px;
+      transform: scale(-1, -1);
+    }
+
+    .fade-in {
+      animation: fadeUp 1.2s ease-out backwards;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .scroll-ornament {
+      color: var(--maroon);
+      font-size: 1.6rem;
+      margin: 18px 0;
+      opacity: 0.6;
+      text-align: center;
+    }
+
+    /* Haldi basket (wicker) */
+    .haldi-basket {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%) rotate(0deg);
+      width: 120px;
+      height: 72px;
+      pointer-events: none;
+      z-index: 2;
+      transition: transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    .haldi-basket.tipping {
+      transform: translateX(-50%) rotate(-24deg) translateY(-6px);
+    }
+
+    .haldi-basket .basket-rim {
+      position: absolute;
+      top: 0;
+      left: -4%;
+      width: 108%;
+      height: 18px;
+      background:
+        radial-gradient(ellipse at center, #a05a1e 0%, #6b2f12 75%, #3d1a08 100%);
+      border-radius: 50%;
+      box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .haldi-basket .basket-body {
+      position: absolute;
+      top: 10px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        repeating-linear-gradient(48deg, #a05a1e 0 4px, #7a3c14 4px 8px, #6b2f12 8px 12px),
+        linear-gradient(180deg, #a05a1e, #5a2b0e);
+      clip-path: polygon(7% 0%, 93% 0%, 100% 100%, 0% 100%);
+      border-radius: 0 0 50% 50% / 0 0 45% 45%;
+      box-shadow: inset 0 -5px 8px rgba(0, 0, 0, 0.4), 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    .haldi-basket .basket-body::after {
+      /* horizontal weave lines */
+      content: '';
+      position: absolute;
+      inset: 2px 2px 6px 2px;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 8px, rgba(40, 20, 8, 0.45) 8px 9px);
+      clip-path: inherit;
+      opacity: 0.8;
+    }
+
+    .basket-contents {
+      position: absolute;
+      top: 4px;
+      left: 8%;
+      width: 84%;
+      height: 26px;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .pile-flower {
+      position: absolute;
+      font-size: 1.15rem;
+      bottom: 0;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+      animation: settle 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    @keyframes settle {
+      from {
+        transform: translateY(-14px) rotate(35deg);
+        opacity: 0.2;
+      }
+
+      to {
+        transform: translateY(0) rotate(var(--r, 0deg));
+        opacity: 1;
+      }
+    }
+
+    /* Bride emoji — shower target */
+    .haldi-bride {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.3);
+      font-size: 4.2rem;
+      line-height: 1;
+      opacity: 0;
+      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+      user-select: none;
+      z-index: 3;
+      filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.25));
+    }
+
+    .haldi-bride.visible {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    /* Thrown flower (haldi victory) */
+    .shower-flower {
+      position: absolute;
+      font-size: 1.5rem;
+      pointer-events: none;
+      z-index: 4;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+      will-change: transform;
+    }
+
+    .shower-flower.splat {
+      animation: splatPop 0.5s ease-out forwards;
+    }
+
+    @keyframes splatPop {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      60% {
+        transform: scale(1.9);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(0.3);
+        opacity: 0;
+      }
+    }
+
+    /* Solah-shringaar hint in the counter */
+    .shringaar-hint {
+      font-style: italic;
+      color: var(--henna);
+      opacity: 0.75;
+      font-size: 0.85em;
+      margin-left: 0.4em;
+    }
+
+    @media (max-height: 700px) {
+      .title {
+        font-size: clamp(3rem, 8vw, 5rem);
+      }
+
+      .letter {
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      #haldi-area,
+      #sangeet-area,
+      #pheras-area {
+        height: 340px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="corner tl">❦</div>
+  <div class="corner tr">❦</div>
+  <div class="corner bl">❦</div>
+  <div class="corner br">❦</div>
+
+  <div id="game">
+
+    <!-- ============ WELCOME ============ -->
+    <div class="screen active" id="welcome">
+      <div class="mandala-bg" aria-hidden="true">
+        <svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+          <g fill="none" stroke="#6b1f2b" stroke-width="0.6">
+            <circle r="8" />
+            <circle r="24" />
+            <circle r="48" />
+            <circle r="72" />
+            <circle r="92" />
+          </g>
+          <g fill="none" stroke="#6b1f2b" stroke-width="0.5">
+            <g id="m-petals-inner">
+              <ellipse rx="4" ry="14" cx="0" cy="-16" />
+            </g>
+            <use href="#m-petals-inner" transform="rotate(45)" />
+            <use href="#m-petals-inner" transform="rotate(90)" />
+            <use href="#m-petals-inner" transform="rotate(135)" />
+            <use href="#m-petals-inner" transform="rotate(180)" />
+            <use href="#m-petals-inner" transform="rotate(225)" />
+            <use href="#m-petals-inner" transform="rotate(270)" />
+            <use href="#m-petals-inner" transform="rotate(315)" />
+          </g>
+          <g fill="none" stroke="#6b1f2b" stroke-width="0.5">
+            <g id="m-paisley">
+              <path d="M0 -62 C 7 -55, 6 -45, 0 -38 C -6 -45, -7 -55, 0 -62 Z" />
+            </g>
+            <use href="#m-paisley" transform="rotate(30)" />
+            <use href="#m-paisley" transform="rotate(60)" />
+            <use href="#m-paisley" transform="rotate(90)" />
+            <use href="#m-paisley" transform="rotate(120)" />
+            <use href="#m-paisley" transform="rotate(150)" />
+            <use href="#m-paisley" transform="rotate(180)" />
+            <use href="#m-paisley" transform="rotate(210)" />
+            <use href="#m-paisley" transform="rotate(240)" />
+            <use href="#m-paisley" transform="rotate(270)" />
+            <use href="#m-paisley" transform="rotate(300)" />
+            <use href="#m-paisley" transform="rotate(330)" />
+          </g>
+          <g fill="#6b1f2b">
+            <g id="m-dots">
+              <circle cx="0" cy="-86" r="1.4" />
+            </g>
+            <use href="#m-dots" transform="rotate(15)" />
+            <use href="#m-dots" transform="rotate(30)" />
+            <use href="#m-dots" transform="rotate(45)" />
+            <use href="#m-dots" transform="rotate(60)" />
+            <use href="#m-dots" transform="rotate(75)" />
+            <use href="#m-dots" transform="rotate(90)" />
+            <use href="#m-dots" transform="rotate(105)" />
+            <use href="#m-dots" transform="rotate(120)" />
+            <use href="#m-dots" transform="rotate(135)" />
+            <use href="#m-dots" transform="rotate(150)" />
+            <use href="#m-dots" transform="rotate(165)" />
+            <use href="#m-dots" transform="rotate(180)" />
+            <use href="#m-dots" transform="rotate(195)" />
+            <use href="#m-dots" transform="rotate(210)" />
+            <use href="#m-dots" transform="rotate(225)" />
+            <use href="#m-dots" transform="rotate(240)" />
+            <use href="#m-dots" transform="rotate(255)" />
+            <use href="#m-dots" transform="rotate(270)" />
+            <use href="#m-dots" transform="rotate(285)" />
+            <use href="#m-dots" transform="rotate(300)" />
+            <use href="#m-dots" transform="rotate(315)" />
+            <use href="#m-dots" transform="rotate(330)" />
+            <use href="#m-dots" transform="rotate(345)" />
+          </g>
+        </svg>
+      </div>
+      <div class="fade-in" style="animation-delay: 0.4s">
+        <div class="subtitle">A little something</div>
+        <h1 class="title">For Vinshu</h1>
+        <div class="subtitle">on her wedding day</div>
+      </div>
+      <div class="fade-in" style="animation-delay: 1.2s" style="margin-top: 30px;">
+        <div class="scroll-ornament">⸻ ❦ ⸻</div>
+        <p class="instruction" style="max-width: 480px;">
+          Since I couldn't be there in person, I made you a little journey through the day —
+          four small moments, one for each ceremony. Play through them, and at the end,
+          I've left you something.
+        </p>
+        <div style="text-align:center; margin-top: 20px;">
+          <button onclick="startJourney()">Begin the Journey</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ STAGE 1: HALDI ============ -->
+    <div class="screen" id="stage-haldi">
+      <div class="progress-dots" id="dots-haldi"></div>
+      <div class="fade-in">
+        <div class="ornament" style="font-size:1.2rem">✦</div>
+        <div class="stage-hindi">Ceremony One</div>
+        <h2 class="stage-name">The Haldi</h2>
+        <div class="stage-devanagari">हल्दी</div>
+        <p class="instruction">
+          Friends and family shower you with turmeric and petals for a golden glow.
+          Catch them into the basket — all sixteen, for the <em>solah shringaar</em>.
+        </p>
+      </div>
+      <div id="haldi-area">
+        <div class="haldi-bride" id="haldi-bride" aria-hidden="true">👰🏽</div>
+        <div class="haldi-basket" id="haldi-basket" aria-hidden="true">
+          <div class="basket-body"></div>
+          <div class="basket-rim"></div>
+          <div class="basket-contents" id="basket-contents"></div>
+        </div>
+      </div>
+      <div class="score-display">Collected: <span id="haldi-score">0</span> / 16<span class="shringaar-hint">solah
+          shringaar</span></div>
+    </div>
+
+    <!-- ============ STAGE 2: MEHNDI ============ -->
+    <div class="screen" id="stage-mehndi">
+      <div class="progress-dots" id="dots-mehndi"></div>
+      <div class="fade-in">
+        <div class="ornament" style="font-size:1.2rem">✦ ✦</div>
+        <div class="stage-hindi">Ceremony Two</div>
+        <h2 class="stage-name">The Mehndi</h2>
+        <div class="stage-devanagari">मेहंदी</div>
+        <p class="instruction">
+          Tap the paste to reveal the mehndi hidden beneath — twelve
+          touches and the design shows through completely.
+        </p>
+      </div>
+      <div class="mehndi-wrap">
+        <canvas id="mehndi-base" width="360" height="360" aria-hidden="true"></canvas>
+        <canvas id="mehndi-mask" width="360" height="360" aria-label="Tap to reveal mehndi"></canvas>
+        <div class="mehndi-progress" id="mehndi-progress">Tap to reveal the mehndi · 0 / 12</div>
+      </div>
+    </div>
+
+    <!-- ============ STAGE 3: SANGEET ============ -->
+    <div class="screen" id="stage-sangeet">
+      <div class="progress-dots" id="dots-sangeet"></div>
+      <div class="fade-in">
+        <div class="ornament" style="font-size:1.2rem">✦ ✦ ✦</div>
+        <div class="stage-hindi">Ceremony Three</div>
+        <h2 class="stage-name">The Sangeet</h2>
+        <div class="stage-devanagari">संगीत</div>
+        <p class="instruction">
+          Beats drift down from the music. Catch them in turn — each plays
+          the next note of the <em>saat sur</em>: Sa, Re, Ga, Ma, Pa, Dha, Ni.
+        </p>
+      </div>
+      <div id="sangeet-area">
+        <div class="sangeet-status">
+          <span id="sangeet-hits">Caught: 0 / 7</span>
+          <span id="sangeet-next" class="sangeet-next">Next: <strong>सा</strong> Sa</span>
+        </div>
+        <div class="hit-flash" id="hit-flash"></div>
+        <div class="miss-flash" id="miss-flash"></div>
+      </div>
+    </div>
+
+    <!-- ============ STAGE 4: PHERAS ============ -->
+    <div class="screen" id="stage-pheras">
+      <div class="progress-dots" id="dots-pheras"></div>
+      <div class="fade-in">
+        <div class="ornament" style="font-size:1.2rem">✦ ✦ ✦ ✦</div>
+        <div class="stage-hindi">The Final Ceremony</div>
+        <h2 class="stage-name">The Pheras</h2>
+        <div class="stage-devanagari">फेरे</div>
+        <p class="instruction">
+          Seven circles around the sacred fire — each a vow, each a promise.
+          Guide the couple slowly around, together.
+        </p>
+      </div>
+      <div id="pheras-area">
+        <div class="phera-count" id="phera-count">Circle 1 of 7</div>
+        <div class="vow-display" id="vow-display">
+          <div class="vow-text" id="vow-text"></div>
+          <button class="vow-agree" id="vow-agree" type="button">I agree</button>
+        </div>
+        <div class="sacred-fire" aria-hidden="true">
+          <div class="kund-base"></div>
+          <div class="kund-rim"></div>
+          <div class="flame-pod left">
+            <div class="flame outer"></div>
+            <div class="flame mid"></div>
+          </div>
+          <div class="flame-pod center">
+            <div class="flame outer"></div>
+            <div class="flame mid"></div>
+            <div class="flame inner"></div>
+          </div>
+          <div class="flame-pod right">
+            <div class="flame outer"></div>
+            <div class="flame mid"></div>
+          </div>
+          <div class="smoke s1"></div>
+          <div class="smoke s2"></div>
+          <div class="smoke s3"></div>
+          <span class="ember e1"></span>
+          <span class="ember e2"></span>
+          <span class="ember e3"></span>
+          <span class="ember e4"></span>
+          <span class="ember e5"></span>
+        </div>
+        <div class="couple" id="couple" aria-label="Indian bride and groom">
+          <img src="indian_bride_and_groom.svg" alt="" class="couple-img" draggable="false"/>
+        </div>
+      </div>
+      <div class="score-display" style="margin-top:12px; font-style:italic;">Move your mouse or finger in circles around
+        the flame</div>
+    </div>
+
+    <!-- ============ FINALE ============ -->
+    <div class="screen" id="finale">
+      <div class="fade-in" style="animation-delay: 0.3s">
+        <div class="ornament">✦ ❦ ✦</div>
+        <h1 class="finale-title">Vinshu, my love</h1>
+        <div class="scroll-ornament">⸻ ❦ ⸻</div>
+      </div>
+      <div class="letter fade-in" style="animation-delay: 1s">
+        <!-- EDIT THIS LETTER TO MAKE IT YOUR OWN -->
+        <p>
+          I wish more than anything that I could be there today — to hug you,
+          to dance with you, to cry a little when you walked out to the pheras.
+          The world got in the way of the plane ticket, but not of this.
+        </p>
+        <p>
+          Watching you become someone's whole world is only surprising to the people
+          who don't already know you. I've known you my entire life, and I've been
+          quietly watching you become extraordinary the whole time.
+        </p>
+        <p>
+          May your marriage be full of the small, ordinary kinds of joy —
+          bad jokes, shared chai, the fights you laugh about later. May he love
+          you the way you deserve, which is to say, completely.
+        </p>
+        <p>
+          I love you. I love you. I love you.<br>
+          No distance is long enough to change that.
+        </p>
+        <div class="signature">— your sibling, always</div>
+        <!-- END OF LETTER -->
+      </div>
+      <div class="fade-in" style="animation-delay: 2.5s; margin-top: 24px;">
+        <div class="ornament">✦</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* =================== NAVIGATION =================== */
+    const stages = ['welcome', 'stage-haldi', 'stage-mehndi', 'stage-sangeet', 'stage-pheras', 'finale'];
+    let currentStage = 0;
+
+    function showStage(index) {
+      stages.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (i === index) el.classList.add('active');
+        else el.classList.remove('active');
+      });
+      currentStage = index;
+      updateDots();
+    }
+
+    function updateDots() {
+      // Stages 1-4 have progress dots (index 1,2,3,4)
+      for (let i = 1; i <= 4; i++) {
+        const container = document.getElementById('dots-' + ['haldi', 'mehndi', 'sangeet', 'pheras'][i - 1]);
+        if (!container) continue;
+        container.innerHTML = '';
+        for (let j = 1; j <= 4; j++) {
+          const dot = document.createElement('div');
+          dot.className = 'dot';
+          if (j < i) dot.classList.add('done');
+          else if (j === i) dot.classList.add('current');
+          container.appendChild(dot);
+        }
+      }
+    }
+
+    function startJourney() {
+      showStage(1);
+      startHaldi();
+    }
+
+    function nextStage() {
+      const next = currentStage + 1;
+      showStage(next);
+      if (next === 2) startMehndi();
+      else if (next === 3) startSangeet();
+      else if (next === 4) startPheras();
+      else if (next === 5) startFinale();
+    }
+
+    /* =================== STAGE 1: HALDI =================== */
+    const HALDI_TARGET = 16;
+    const HALDI_ITEMS = ['🌼', '🌻', '🌸', '💛', '✨', '🌺'];
+    let haldiScore = 0;
+    let haldiActive = false;
+    let haldiInterval = null;
+
+    function startHaldi() {
+      haldiScore = 0;
+      haldiActive = true;
+      document.getElementById('haldi-score').textContent = '0';
+      const area = document.getElementById('haldi-area');
+      // Clean slate but preserve basket + bride (they're IDed children we want to keep)
+      area.querySelectorAll('.falling, .shower-flower').forEach(el => el.remove());
+      document.getElementById('basket-contents').innerHTML = '';
+      document.getElementById('haldi-bride').classList.remove('visible');
+      document.getElementById('haldi-basket').classList.remove('tipping');
+
+      haldiInterval = setInterval(() => {
+        if (!haldiActive) return;
+        const el = document.createElement('div');
+        el.className = 'falling';
+        el.textContent = HALDI_ITEMS[Math.floor(Math.random() * HALDI_ITEMS.length)];
+        el.style.left = (4 + Math.random() * 88) + '%';
+        el.style.top = '-40px';
+        area.appendChild(el);
+
+        const duration = 2500 + Math.random() * 1500;
+        const startTime = Date.now();
+        const areaHeight = area.clientHeight;
+
+        function fall() {
+          if (!el.parentElement || el.dataset.caught) return;
+          const elapsed = Date.now() - startTime;
+          const progress = elapsed / duration;
+          if (progress >= 1) {
+            el.remove();
+            return;
+          }
+          // Don't fall past where the basket sits — let them drop off-bottom naturally
+          el.style.top = (progress * (areaHeight - 10) - 40) + 'px';
+          requestAnimationFrame(fall);
+        }
+        requestAnimationFrame(fall);
+
+        el.addEventListener('click', () => {
+          if (el.dataset.caught || !haldiActive) return;
+          el.dataset.caught = 'true';
+          haldiScore++;
+          document.getElementById('haldi-score').textContent = haldiScore;
+          flyToBasket(el, area);
+
+          if (haldiScore >= HALDI_TARGET) {
+            haldiActive = false;
+            clearInterval(haldiInterval);
+            // Wait for the in-flight catches to land, then run victory
+            setTimeout(haldiVictory, 700);
+          }
+        });
+      }, 450);
+    }
+
+    function flyToBasket(el, area) {
+      const emoji = el.textContent;
+      const basket = document.getElementById('haldi-basket');
+      const areaRect = area.getBoundingClientRect();
+      const basketRect = basket.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+
+      const startX = elRect.left - areaRect.left;
+      const startY = elRect.top - areaRect.top;
+      const targetX = basketRect.left - areaRect.left + basketRect.width / 2 - elRect.width / 2;
+      const targetY = basketRect.top - areaRect.top + 4;
+
+      // Pin the element at its current visual position (stops the fall loop's top updates from mattering)
+      el.style.left = startX + 'px';
+      el.style.top = startY + 'px';
+      el.style.pointerEvents = 'none';
+
+      const dx = targetX - startX;
+      const dy = targetY - startY;
+      const arcPeak = -Math.abs(dx) * 0.25 - 36;
+
+      const anim = el.animate([
+        { transform: 'translate(0, 0) scale(1) rotate(0deg)', offset: 0 },
+        { transform: `translate(${dx / 2}px, ${arcPeak}px) scale(1.2) rotate(180deg)`, offset: 0.5 },
+        { transform: `translate(${dx}px, ${dy}px) scale(0.55) rotate(360deg)`, opacity: 0.4, offset: 1 }
+      ], { duration: 520, easing: 'cubic-bezier(0.33, 0.1, 0.6, 1.0)', fill: 'forwards' });
+
+      anim.onfinish = () => {
+        el.remove();
+        addFlowerToBasketPile(emoji);
+      };
+    }
+
+    function addFlowerToBasketPile(emoji) {
+      const contents = document.getElementById('basket-contents');
+      const f = document.createElement('span');
+      f.className = 'pile-flower';
+      f.textContent = emoji;
+      f.style.left = (4 + Math.random() * 78) + '%';
+      f.style.bottom = (Math.random() * 6) + 'px';
+      f.style.setProperty('--r', (Math.random() * 40 - 20) + 'deg');
+      f.style.fontSize = (0.95 + Math.random() * 0.3) + 'rem';
+      contents.appendChild(f);
+    }
+
+    function haldiVictory() {
+      const bride = document.getElementById('haldi-bride');
+      bride.classList.add('visible');
+      // Give the bride a moment to appear, then tip the basket and shower her
+      setTimeout(throwFlowersAtBride, 650);
+    }
+
+    function throwFlowersAtBride() {
+      const area = document.getElementById('haldi-area');
+      const basket = document.getElementById('haldi-basket');
+      const bride = document.getElementById('haldi-bride');
+      const areaRect = area.getBoundingClientRect();
+      const basketRect = basket.getBoundingClientRect();
+      const brideRect = bride.getBoundingClientRect();
+
+      basket.classList.add('tipping');
+
+      const originX = basketRect.left - areaRect.left + basketRect.width / 2;
+      const originY = basketRect.top - areaRect.top + 8;
+      // Target her face, roughly
+      const faceX = brideRect.left - areaRect.left + brideRect.width / 2;
+      const faceY = brideRect.top - areaRect.top + brideRect.height * 0.38;
+
+      for (let i = 0; i < HALDI_TARGET; i++) {
+        setTimeout(() => {
+          const f = document.createElement('div');
+          f.className = 'shower-flower';
+          f.textContent = HALDI_ITEMS[Math.floor(Math.random() * HALDI_ITEMS.length)];
+          const sx = originX + (Math.random() - 0.5) * 40;
+          const sy = originY;
+          f.style.left = sx + 'px';
+          f.style.top = sy + 'px';
+          area.appendChild(f);
+
+          const tx = faceX + (Math.random() - 0.5) * 70;
+          const ty = faceY + (Math.random() - 0.5) * 30;
+          const dx = tx - sx;
+          const dy = ty - sy;
+          const arcPeak = -Math.abs(dx) * 0.35 - 70;
+
+          const anim = f.animate([
+            { transform: 'translate(0, 0) scale(1) rotate(0deg)' },
+            { transform: `translate(${dx / 2}px, ${arcPeak}px) scale(1.25) rotate(180deg)` },
+            { transform: `translate(${dx}px, ${dy}px) scale(1) rotate(360deg)` }
+          ], { duration: 820, easing: 'cubic-bezier(0.2, 0, 0.65, 1)', fill: 'forwards' });
+
+          anim.onfinish = () => {
+            // Splat into a burst on her face
+            f.style.left = (sx + dx) + 'px';
+            f.style.top = (sy + dy) + 'px';
+            f.style.transform = 'translate(0, 0)';
+            f.classList.add('splat');
+            setTimeout(() => f.remove(), 550);
+          };
+        }, i * 70);
+      }
+
+      // After all flowers thrown + splat, transition
+      const totalDur = HALDI_TARGET * 70 + 820 + 500;
+      setTimeout(() => {
+        showTransition('The golden glow suits you ✨', nextStage);
+      }, totalDur);
+    }
+
+    /* =================== STAGE 2: MEHNDI (tap-to-reveal) =================== */
+    const MEHNDI_TARGET = 12;
+    const MEHNDI_SIZE = 360;
+    let mehndiStampCount = 0;
+    let mehndiDone = false;
+
+    function startMehndi() {
+      const base = document.getElementById('mehndi-base');
+      const mask = document.getElementById('mehndi-mask');
+      drawMehndiBase(base.getContext('2d'));
+      drawMehndiMask(mask.getContext('2d'));
+
+      mehndiStampCount = 0;
+      mehndiDone = false;
+      updateMehndiProgress();
+
+      if (!mask.dataset.wired) {
+        mask.dataset.wired = '1';
+        mask.addEventListener('pointerdown', onMehndiReveal);
+      }
+    }
+
+    function drawMehndiBase(ctx) {
+      ctx.clearRect(0, 0, MEHNDI_SIZE, MEHNDI_SIZE);
+      const cx = MEHNDI_SIZE / 2, cy = MEHNDI_SIZE / 2;
+
+      // Warm palm-tone radial background
+      const bg = ctx.createRadialGradient(cx, cy, 20, cx, cy, MEHNDI_SIZE * 0.55);
+      bg.addColorStop(0, '#fff8e5');
+      bg.addColorStop(1, '#e8c891');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, MEHNDI_SIZE, MEHNDI_SIZE);
+
+      // Henna mandala underneath — rich brown so it pops when revealed
+      const HENNA = '#6b2f14';
+      const HENNA_SOFT = 'rgba(107, 47, 20, 0.55)';
+      ctx.strokeStyle = HENNA;
+      ctx.fillStyle = HENNA;
+      ctx.lineWidth = 1.6;
+      ctx.lineCap = 'round';
+
+      // Center six-petal lotus
+      ctx.beginPath();
+      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+      ctx.stroke();
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2;
+        const px = cx + Math.cos(a) * 14;
+        const py = cy + Math.sin(a) * 14;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate(a + Math.PI / 2);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 5, 13, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6 + 1 / 12) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * 22, cy + Math.sin(a) * 22, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Ring 1
+      ctx.beginPath();
+      ctx.arc(cx, cy, 42, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Paisley ring (12 mangoes)
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        const px = cx + Math.cos(a) * 62;
+        const py = cy + Math.sin(a) * 62;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate(a + Math.PI);
+        ctx.beginPath();
+        ctx.moveTo(0, -14);
+        ctx.bezierCurveTo(9, -10, 8, 8, 0, 14);
+        ctx.bezierCurveTo(-8, 8, -9, -10, 0, -14);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, -10);
+        ctx.bezierCurveTo(5, -8, 5, 4, 0, 8);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, -16, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Ring 2
+      ctx.strokeStyle = HENNA_SOFT;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 92, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = HENNA;
+
+      // Scalloped arches (16 small circles with dots)
+      for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * Math.PI * 2;
+        const px = cx + Math.cos(a) * 112;
+        const py = cy + Math.sin(a) * 112;
+        ctx.beginPath();
+        ctx.arc(px, py, 9, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(px, py, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Ring 3
+      ctx.strokeStyle = HENNA_SOFT;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 132, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = HENNA;
+
+      // Outer leaf ring (24 teardrop leaves)
+      for (let i = 0; i < 24; i++) {
+        const a = (i / 24) * Math.PI * 2;
+        const px = cx + Math.cos(a) * 150;
+        const py = cy + Math.sin(a) * 150;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate(a + Math.PI / 2);
+        ctx.beginPath();
+        ctx.moveTo(0, -10);
+        ctx.bezierCurveTo(4, -5, 4, 5, 0, 10);
+        ctx.bezierCurveTo(-4, 5, -4, -5, 0, -10);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Dot ring (36 dots)
+      for (let i = 0; i < 36; i++) {
+        const a = (i / 36) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * 168, cy + Math.sin(a) * 168, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawMehndiMask(ctx) {
+      ctx.clearRect(0, 0, MEHNDI_SIZE, MEHNDI_SIZE);
+
+      // Solid cream overlay (the "henna paste" covering the design)
+      const g = ctx.createRadialGradient(
+        MEHNDI_SIZE / 2, MEHNDI_SIZE / 2, 40,
+        MEHNDI_SIZE / 2, MEHNDI_SIZE / 2, MEHNDI_SIZE * 0.6
+      );
+      g.addColorStop(0, '#f5e4c0');
+      g.addColorStop(1, '#d9bf8a');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, MEHNDI_SIZE, MEHNDI_SIZE);
+
+      // Faint gold hint of the pattern beneath, so the user sees the shape of what's hidden
+      ctx.strokeStyle = 'rgba(139, 58, 31, 0.18)';
+      ctx.lineWidth = 1;
+      [42, 92, 132, 168].forEach(r => {
+        ctx.beginPath();
+        ctx.arc(MEHNDI_SIZE / 2, MEHNDI_SIZE / 2, r, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // Little "tap here" cue dots around the circle, subtly visible
+      ctx.fillStyle = 'rgba(107, 47, 20, 0.22)';
+      const cues = [
+        [180, 180], [180, 100], [260, 180], [180, 260], [100, 180],
+        [232, 128], [232, 232], [128, 232], [128, 128],
+        [180, 40], [320, 180], [180, 320], [40, 180],
+      ];
+      cues.forEach(([x, y]) => {
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function onMehndiReveal(e) {
+      if (mehndiDone) return;
+      e.preventDefault();
+      const mask = document.getElementById('mehndi-mask');
+      const rect = mask.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (mask.width / rect.width);
+      const y = (e.clientY - rect.top) * (mask.height / rect.height);
+
+      const ctx = mask.getContext('2d');
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      const g = ctx.createRadialGradient(x, y, 0, x, y, 46);
+      g.addColorStop(0, 'rgba(0,0,0,1)');
+      g.addColorStop(0.75, 'rgba(0,0,0,1)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x, y, 46, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      mehndiStampCount++;
+      updateMehndiProgress();
+
+      if (mehndiStampCount >= MEHNDI_TARGET && !mehndiDone) {
+        mehndiDone = true;
+        // Fully clear the mask to reveal the complete mandala
+        ctx.clearRect(0, 0, MEHNDI_SIZE, MEHNDI_SIZE);
+        document.getElementById('mehndi-progress').textContent = 'Beautiful ✨';
+        setTimeout(() => {
+          showTransition('A bride-to-be with the prettiest hands 🤎', nextStage);
+        }, 1200);
+      }
+    }
+
+    function updateMehndiProgress() {
+      const el = document.getElementById('mehndi-progress');
+      if (!el || mehndiDone) return;
+      el.textContent = 'Tap to reveal the mehndi · ' + mehndiStampCount + ' / ' + MEHNDI_TARGET;
+    }
+
+    /* =================== STAGE 3: SANGEET (saat sur + Web Audio) =================== */
+    const SAAT_SUR = [
+      { name: 'Sa',  deva: 'सा',  freq: 261.63 }, // C4
+      { name: 'Re',  deva: 'रे',  freq: 293.66 }, // D4
+      { name: 'Ga',  deva: 'ग',   freq: 329.63 }, // E4
+      { name: 'Ma',  deva: 'म',   freq: 349.23 }, // F4
+      { name: 'Pa',  deva: 'प',   freq: 392.00 }, // G4
+      { name: 'Dha', deva: 'ध',   freq: 440.00 }, // A4
+      { name: 'Ni',  deva: 'नि',  freq: 493.88 }, // B4
+    ];
+    const SANGEET_TARGET = SAAT_SUR.length;
+
+    let sangeetHits = 0;
+    let sangeetMisses = 0;
+    let sangeetActive = false;
+    let sangeetSpawnTimer = null;
+    let audioCtx = null;
+    let noteIndex = 0;
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        try {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+          audioCtx = null;
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => { });
+      }
+      return audioCtx;
+    }
+
+    // Single tone with a soft envelope — used for notes and victory melody
+    function playTone(freq, dur, delay, gain, type) {
+      const ctx = ensureAudio();
+      if (!ctx) return;
+      const t = ctx.currentTime + (delay || 0);
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = type || 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(gain || 0.22, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + (dur || 0.5));
+      osc.connect(g).connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + (dur || 0.5) + 0.05);
+    }
+
+    function playSurNote(idx) {
+      const n = SAAT_SUR[idx];
+      if (!n) return;
+      // Body + subtle octave harmonic for bell warmth
+      playTone(n.freq, 0.6, 0, 0.25, 'triangle');
+      playTone(n.freq * 2, 0.45, 0, 0.06, 'sine');
+    }
+
+    function playVictoryMusic() {
+      const B = 0.16; // base beat duration
+      const seq = [
+        [261.63, 0 * B, 0.18, 0.22],  // Sa
+        [293.66, 1 * B, 0.18, 0.22],  // Re
+        [329.63, 2 * B, 0.18, 0.22],  // Ga
+        [349.23, 3 * B, 0.18, 0.22],  // Ma
+        [392.00, 4 * B, 0.18, 0.22],  // Pa
+        [440.00, 5 * B, 0.18, 0.22],  // Dha
+        [493.88, 6 * B, 0.18, 0.22],  // Ni
+        [523.25, 7 * B, 0.30, 0.26],  // Sa' (octave)
+        [440.00, 9 * B, 0.14, 0.20],
+        [523.25, 10 * B, 0.14, 0.20],
+        [587.33, 11 * B, 0.14, 0.20], // Re'
+        [523.25, 12 * B, 0.14, 0.22],
+        [493.88, 13 * B, 0.14, 0.22],
+        [523.25, 14 * B, 0.9, 0.26],  // held final
+      ];
+      seq.forEach(([f, d, dur, g]) => playTone(f, dur, d, g, 'triangle'));
+      // Root + fifth under held final — resolved sound
+      playTone(261.63, 1.0, 14 * B, 0.10, 'sine');
+      playTone(392.00, 1.0, 14 * B, 0.08, 'sine');
+    }
+
+    function updateSangeetUI() {
+      document.getElementById('sangeet-hits').textContent = 'Caught: ' + sangeetHits + ' / ' + SANGEET_TARGET;
+      const nextEl = document.getElementById('sangeet-next');
+      if (nextEl) {
+        if (noteIndex >= SANGEET_TARGET) {
+          nextEl.innerHTML = '<strong>✨</strong> Saat sur';
+        } else {
+          const n = SAAT_SUR[noteIndex];
+          nextEl.innerHTML = 'Next: <strong>' + n.deva + '</strong> ' + n.name;
+        }
+      }
+    }
+
+    function startSangeet() {
+      sangeetHits = 0;
+      sangeetMisses = 0;
+      sangeetActive = true;
+      noteIndex = 0;
+      updateSangeetUI();
+
+      const area = document.getElementById('sangeet-area');
+      area.querySelectorAll('.note-beat').forEach(el => el.remove());
+
+      ensureAudio();
+      sangeetSpawnTimer = setInterval(spawnNoteBeat, 1100);
+      spawnNoteBeat();
+    }
+
+    function spawnNoteBeat() {
+      if (!sangeetActive || noteIndex >= SANGEET_TARGET) return;
+      const area = document.getElementById('sangeet-area');
+      const idx = noteIndex; // beat locked to whichever note is currently expected when it spawns
+      const note = SAAT_SUR[idx];
+
+      const el = document.createElement('div');
+      el.className = 'note-beat n' + idx;
+      el.dataset.noteIndex = idx;
+      el.innerHTML = '<span class="note-deva">' + note.deva + '</span><span class="note-latin">' + note.name + '</span>';
+      el.style.left = (6 + Math.random() * 84) + '%';
+      el.style.top = '-60px';
+      area.appendChild(el);
+
+      const duration = 3200 + Math.random() * 900;
+      const startTime = Date.now();
+      const areaHeight = area.clientHeight;
+
+      function fall() {
+        if (!el.parentElement || el.dataset.caught) return;
+        const elapsed = Date.now() - startTime;
+        const progress = elapsed / duration;
+        if (progress >= 1) {
+          if (!el.dataset.caught && sangeetActive && parseInt(el.dataset.noteIndex) === noteIndex) {
+            sangeetMisses++;
+            flashMiss();
+          }
+          el.remove();
+          return;
+        }
+        el.style.top = (progress * (areaHeight + 60) - 60) + 'px';
+        requestAnimationFrame(fall);
+      }
+      requestAnimationFrame(fall);
+
+      el.addEventListener('click', () => {
+        if (el.dataset.caught || !sangeetActive) return;
+        const beatIdx = parseInt(el.dataset.noteIndex);
+        // Only the currently-expected note advances the scale
+        if (beatIdx !== noteIndex) return;
+        el.dataset.caught = 'true';
+        el.classList.add('caught');
+
+        playSurNote(beatIdx);
+        sangeetHits++;
+        noteIndex++;
+        flashHit();
+        updateSangeetUI();
+        setTimeout(() => el.remove(), 550);
+
+        if (noteIndex >= SANGEET_TARGET) {
+          sangeetActive = false;
+          clearInterval(sangeetSpawnTimer);
+          // Clear any stragglers from the old note that are still falling
+          document.querySelectorAll('#sangeet-area .note-beat:not(.caught)').forEach(b => {
+            b.classList.add('caught');
+            setTimeout(() => b.remove(), 550);
+          });
+          setTimeout(playVictoryMusic, 450);
+          setTimeout(() => {
+            showTransition('Saat sur complete — you made music 🎶', nextStage);
+          }, 4200);
+        }
+      });
+    }
+
+    function flashHit() {
+      const f = document.getElementById('hit-flash');
+      f.style.animation = 'none';
+      void f.offsetWidth;
+      f.style.animation = 'flash 0.4s ease-out';
+    }
+    function flashMiss() {
+      const f = document.getElementById('miss-flash');
+      f.style.animation = 'none';
+      void f.offsetWidth;
+      f.style.animation = 'flash 0.4s ease-out';
+    }
+
+    /* =================== STAGE 4: PHERAS =================== */
+    let pheraCount = 0;
+    let pheraAngle = 0;
+    let lastAngle = null;
+    let angleAccumulator = 0;
+    let pherasActive = false;
+
+    const VOWS = [
+      'With this step, we promise to share food and nurture each other.',
+      'With this step, we vow to grow in strength together.',
+      'With this step, we share our wealth and work for prosperity.',
+      'With this step, we promise to raise a family with love.',
+      "With this step, we care for each other's health and happiness.",
+      'With this step, we promise to be best friends for life.',
+      'With this step, we pledge love and loyalty through every lifetime.',
+    ];
+
+    function showVow(index) {
+      const el = document.getElementById('vow-display');
+      const textEl = document.getElementById('vow-text');
+      if (!el || !textEl || !VOWS[index]) return;
+      textEl.textContent = VOWS[index];
+      el.classList.add('active');
+      pherasActive = false; // freeze circling until user agrees
+    }
+
+    function acceptVow() {
+      const el = document.getElementById('vow-display');
+      if (!el.classList.contains('active')) return;
+      el.classList.remove('active');
+      if (pheraCount >= 7) {
+        setTimeout(() => {
+          showTransition('Seven promises. One forever. 🔥', nextStage);
+        }, 700);
+      } else {
+        // Resume circling; reset lastAngle to avoid a delta jump when user re-engages
+        pherasActive = true;
+        lastAngle = null;
+      }
+    }
+
+    function startPheras() {
+      pheraCount = 0;
+      pheraAngle = 0;
+      lastAngle = null;
+      angleAccumulator = 0;
+      pherasActive = true;
+      document.getElementById('phera-count').textContent = 'Circle 1 of 7';
+
+      const area = document.getElementById('pheras-area');
+      const couple = document.getElementById('couple');
+      const radius = 130;
+
+      function updateCouple() {
+        const cx = area.clientWidth / 2;
+        const cy = area.clientHeight / 2;
+        const x = cx + Math.cos(pheraAngle) * radius - 55;
+        const y = cy + Math.sin(pheraAngle) * radius - 44;
+        couple.style.left = x + 'px';
+        couple.style.top = y + 'px';
+      }
+      updateCouple();
+
+      function handleMove(e) {
+        if (!pherasActive) return;
+        const rect = area.getBoundingClientRect();
+        const touch = e.touches ? e.touches[0] : e;
+        const mx = touch.clientX - rect.left;
+        const my = touch.clientY - rect.top;
+        const cx = area.clientWidth / 2;
+        const cy = area.clientHeight / 2;
+        const dx = mx - cx, dy = my - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        // Only count if near the orbit
+        if (dist < 60 || dist > 200) return;
+
+        const newAngle = Math.atan2(dy, dx);
+
+        if (lastAngle !== null) {
+          let delta = newAngle - lastAngle;
+          // Normalize delta
+          if (delta > Math.PI) delta -= 2 * Math.PI;
+          if (delta < -Math.PI) delta += 2 * Math.PI;
+
+          // Only count forward motion (clockwise or counterclockwise, either is fine — pick one)
+          if (Math.abs(delta) < 0.5) {
+            angleAccumulator += delta;
+            pheraAngle += delta;
+            updateCouple();
+
+            // Trail
+            const trail = document.createElement('div');
+            trail.className = 'phera-trail';
+            const tx = cx + Math.cos(pheraAngle) * radius - 3;
+            const ty = cy + Math.sin(pheraAngle) * radius - 3;
+            trail.style.left = tx + 'px';
+            trail.style.top = ty + 'px';
+            area.appendChild(trail);
+            setTimeout(() => trail.remove(), 1000);
+
+            // Check for full circle
+            if (Math.abs(angleAccumulator) >= 2 * Math.PI) {
+              angleAccumulator = 0;
+              pheraCount++;
+              document.getElementById('phera-count').textContent =
+                pheraCount >= 7 ? 'Seven vows, complete ✨' : 'Circle ' + (pheraCount + 1) + ' of 7';
+
+              // Show the vow just taken (pheraCount is 1..7, array is 0-indexed).
+              // showVow pauses pherasActive; acceptVow resumes or transitions.
+              showVow(pheraCount - 1);
+            }
+          }
+        }
+        lastAngle = newAngle;
+      }
+
+      area.addEventListener('mousemove', handleMove);
+      area.addEventListener('touchmove', (e) => { e.preventDefault(); handleMove(e); }, { passive: false });
+
+      const agreeBtn = document.getElementById('vow-agree');
+      if (agreeBtn && !agreeBtn.dataset.wired) {
+        agreeBtn.dataset.wired = '1';
+        agreeBtn.addEventListener('click', acceptVow);
+      }
+    }
+
+    /* =================== TRANSITION =================== */
+    let transitioning = false;
+    function showTransition(message, callback) {
+      if (transitioning) return;
+      transitioning = true;
+      const overlay = document.createElement('div');
+      overlay.style.cssText = `
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(253,244,227,0.98), rgba(244,168,37,0.6));
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200;
+    font-family: 'Tangerine', cursive;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    color: var(--maroon);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    text-align: center;
+    padding: 20px;
+  `;
+      overlay.textContent = message;
+      document.body.appendChild(overlay);
+      requestAnimationFrame(() => overlay.style.opacity = '1');
+
+      setTimeout(() => {
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.remove();
+          transitioning = false;
+          callback();
+        }, 600);
+      }, 1800);
+    }
+
+    /* =================== FINALE =================== */
+    function startFinale() {
+      // Rain petals continuously
+      const petals = ['🌸', '🌺', '🌼', '🌷', '💐', '❦', '✦'];
+      setInterval(() => {
+        const p = document.createElement('div');
+        p.className = 'petal';
+        p.textContent = petals[Math.floor(Math.random() * petals.length)];
+        p.style.left = (Math.random() * 100) + 'vw';
+        p.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+        document.body.appendChild(p);
+        const duration = 6000 + Math.random() * 4000;
+        const drift = (Math.random() - 0.5) * 200;
+        const startTime = Date.now();
+        const startX = parseFloat(p.style.left);
+
+        function animate() {
+          if (!p.parentElement) return;
+          const elapsed = Date.now() - startTime;
+          const progress = elapsed / duration;
+          if (progress >= 1) {
+            p.remove();
+            return;
+          }
+          p.style.top = (progress * (window.innerHeight + 60) - 30) + 'px';
+          p.style.left = `calc(${startX}vw + ${drift * progress}px)`;
+          p.style.transform = `rotate(${progress * 720}deg)`;
+          requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+      }, 280);
+    }
+
+  </script>
+</body>
+
+</html>
