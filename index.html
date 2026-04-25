@@ -1979,7 +1979,9 @@
         setTimeout(() => {
           const f = document.createElement('div');
           f.className = 'shower-flower';
-          f.textContent = HALDI_ITEMS[Math.floor(Math.random() * HALDI_ITEMS.length)];
+          // Final celebration shower is yellow only — match what was caught
+          const yellow = Array.from(HALDI_FLOWERS);
+          f.textContent = yellow[Math.floor(Math.random() * yellow.length)];
           const sx = originX + (Math.random() - 0.5) * 40;
           const sy = originY;
           f.style.left = sx + 'px';
