@@ -2424,7 +2424,8 @@
       d.textContent = '💃';
       d.style.transform = `translateX(-50%) scale(1, 1) rotate(0deg)`;
     }
-    // After Ni, rapidly mirror back and forth across the tilts — full finale dance
+    // After Ni, cycle the tilts without flipping — facing right throughout.
+    // Mirroring at this rapid pace felt like spinning rather than dancing.
     function dancerVictoryCycle() {
       const d = document.getElementById('sangeet-dancer');
       if (!d) return;
@@ -2436,9 +2437,8 @@
       ];
       let i = 0;
       const id = setInterval(() => {
-        const facing = i % 2 === 0 ? +1 : -1;
-        const tilt   = finaleTilts[i % finaleTilts.length];
-        d.style.transform = `translateX(-50%) scale(${1.3 * facing}, 1.3) ${tilt}`;
+        const tilt = finaleTilts[i % finaleTilts.length];
+        d.style.transform = `translateX(-50%) scale(1.3, 1.3) ${tilt}`;
         i++;
         if (i >= 14) clearInterval(id); // ~2.8s of dancing at 200ms per swap
       }, 200);
