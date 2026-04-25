@@ -1554,8 +1554,8 @@
           <div class="basket-contents" id="basket-contents"></div>
         </div>
       </div>
-      <div class="score-display">Collected: <span id="haldi-score">0</span> / 16 yellow flowers<br><span class="shringaar-hint">
-          shringaar</span></div>
+      <div class="score-display">Collected: <span id="haldi-score">0</span> / 16<br><span class="shringaar-hint">
+          yellow flowers</span></div>
     </div>
 
     <!-- ============ STAGE 2: MEHNDI ============ -->
@@ -1735,7 +1735,7 @@
       1: {
         hindi: 'हल्दी',
         title: 'The Haldi',
-        text: 'Friends and family anoint you with turmeric and petals — the first golden glow of the day. Catch each one into the basket. Sixteen in all, for the solah shringaar.',
+        text: 'Friends and family anoint you with turmeric and petals — the first golden glow of the day. Catch each yellow flower into the basket. Sixteen in all, for the solah shringaar.',
         start: () => startHaldi(),
       },
       2: {
@@ -2389,18 +2389,27 @@
       { name: 'Ni', deva: 'नि', freq: 493.88 }, // B4
     ];
     const SANGEET_TARGET = SAAT_SUR.length;
-    // One dancer 💃, two tilt poses she alternates between, scale grows with the scale.
-    // Lean-left / lean-right / lift creates a dance feel from the same emoji.
+    // Two poses for the same 💃: facing right (scaleX +1) and facing left (scaleX -1).
+    // Each beat picks a pose AND a tilt, so the dancer mirrors AND leans every time.
+    // Pose × tilt gives genuinely different visual states from one emoji.
+    const DANCER_FACINGS = [+1, -1, +1, -1, +1, -1, +1];
     const DANCER_TILTS = [
-      'rotate(-18deg) translateY(-2px)', // pose A — lean left
-      'rotate(18deg)  translateY(-2px)', // pose B — lean right
+      'rotate(0deg)',                     // Sa  — upright
+      'rotate(-12deg) translateY(-3px)',  // Re  — mirror, lean left
+      'rotate(15deg)  translateY(-3px)',  // Ga  — original, lean right
+      'rotate(-22deg) translateY(-10px)', // Ma  — mirror, leap left
+      'rotate(20deg)',                    // Pa  — original, sway hard
+      'rotate(-14deg) translateY(-14px)', // Dha — mirror, big leap
+      'rotate(10deg)  translateY(-10px)', // Ni  — original, finale
     ];
+    const DANCER_SCALES = [1.00, 1.05, 1.10, 1.18, 1.10, 1.22, 1.32];
 
     function dancerTransform(idx) {
-      // Scale grows from Sa (1.0) to Ni (≈1.28) to add energy as she dances
-      const scale = (1 + idx * 0.045).toFixed(2);
-      const tilt = DANCER_TILTS[idx % DANCER_TILTS.length];
-      return `translateX(-50%) scale(${scale}) ${tilt}`;
+      const facing = DANCER_FACINGS[idx] ?? 1;
+      const scale  = DANCER_SCALES[idx]  ?? 1;
+      const tilt   = DANCER_TILTS[idx]   ?? 'rotate(0deg)';
+      // scale(x, y) — flip x to mirror, keep y intact
+      return `translateX(-50%) scale(${scale * facing}, ${scale}) ${tilt}`;
     }
 
     function setDancerPose(idx) {
@@ -2413,16 +2422,23 @@
       const d = document.getElementById('sangeet-dancer');
       if (!d) return;
       d.textContent = '💃';
-      d.style.transform = `translateX(-50%) scale(1) rotate(0deg)`;
+      d.style.transform = `translateX(-50%) scale(1, 1) rotate(0deg)`;
     }
-    // After Ni, cycle rapidly between the two tilt poses for a finale dance
+    // After Ni, rapidly mirror back and forth across the tilts — full finale dance
     function dancerVictoryCycle() {
       const d = document.getElementById('sangeet-dancer');
       if (!d) return;
+      const finaleTilts = [
+        'rotate(-18deg) translateY(-8px)',
+        'rotate(20deg)  translateY(-8px)',
+        'rotate(-12deg) translateY(-16px)',
+        'rotate(15deg)  translateY(-16px)',
+      ];
       let i = 0;
       const id = setInterval(() => {
-        const tilt = DANCER_TILTS[i % DANCER_TILTS.length];
-        d.style.transform = `translateX(-50%) scale(1.32) ${tilt} translateY(-6px)`;
+        const facing = i % 2 === 0 ? +1 : -1;
+        const tilt   = finaleTilts[i % finaleTilts.length];
+        d.style.transform = `translateX(-50%) scale(${1.3 * facing}, 1.3) ${tilt}`;
         i++;
         if (i >= 14) clearInterval(id); // ~2.8s of dancing at 200ms per swap
       }, 200);
