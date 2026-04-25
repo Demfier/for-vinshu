@@ -1188,6 +1188,75 @@
       color: var(--maroon);
     }
 
+    /* Sangeet → recording handoff overlay (interactive, button-driven) */
+    .recording-handoff {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(253, 244, 227, 0.98), rgba(244, 168, 37, 0.6));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      z-index: 200;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .recording-handoff.visible {
+      opacity: 1;
+    }
+
+    .handoff-message {
+      font-family: 'Tangerine', cursive;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      color: var(--maroon);
+      line-height: 1.1;
+      max-width: 90vw;
+    }
+
+    .handoff-btn {
+      font-family: 'Marcellus', serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      color: var(--cream);
+      background: var(--maroon);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(107, 31, 43, 0.35);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .handoff-btn:hover,
+    .handoff-btn:focus-visible {
+      outline: none;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(107, 31, 43, 0.45);
+    }
+
+    .handoff-skip {
+      font-family: 'Marcellus', serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.06em;
+      color: var(--maroon);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      opacity: 0.7;
+      padding: 4px 12px;
+    }
+
+    .handoff-skip:hover,
+    .handoff-skip:focus-visible {
+      opacity: 1;
+      outline: none;
+    }
+
     .petal {
       position: fixed;
       top: -30px;
@@ -2574,13 +2643,11 @@
           // Cycle through every dance pose alongside the victory tune
           setTimeout(dancerVictoryCycle, 450);
           setTimeout(() => {
-            // First the joy beat, then a quiet handoff to the recording —
-            // I couldn't be there to sing live, so play it now and let it
-            // carry through the rest of the journey.
+            // First the joy beat, then a button-driven handoff so the
+            // recording's play() lives in a real user-gesture context.
             showTransition('You dance like joy itself 💃', () => {
-              showTransition("couldn't sing it for you in person — recorded this 🎵", () => {
+              showRecordingHandoff(() => {
                 stopAmbient();
-                playRecording();
                 nextStage();
               });
             });
@@ -2792,6 +2859,34 @@
         const p = rec.play();
         if (p && p.catch) p.catch(() => { /* autoplay blocked — user can use the button */ });
       } catch (_) { /* ignore */ }
+    }
+
+    // Interactive handoff shown after sangeet. User taps "listen" or "skip" —
+    // both advance; only "listen" starts the recording (in a real gesture
+    // context so the browser actually allows it).
+    function showRecordingHandoff(callback) {
+      const overlay = document.createElement('div');
+      overlay.className = 'recording-handoff';
+      overlay.innerHTML = `
+        <div class="handoff-message">couldn't sing it for you in person — recorded this 🎵</div>
+        <button type="button" class="handoff-btn" id="handoff-play">
+          <span aria-hidden="true">▶</span>&nbsp;listen
+        </button>
+        <button type="button" class="handoff-skip" id="handoff-skip">skip →</button>
+      `;
+      document.body.appendChild(overlay);
+      requestAnimationFrame(() => overlay.classList.add('visible'));
+
+      const finish = (withAudio) => {
+        if (withAudio) playRecording();
+        overlay.classList.remove('visible');
+        setTimeout(() => {
+          overlay.remove();
+          callback();
+        }, 600);
+      };
+      overlay.querySelector('#handoff-play').addEventListener('click', () => finish(true));
+      overlay.querySelector('#handoff-skip').addEventListener('click', () => finish(false));
     }
 
     function setupRecordingButton() {
