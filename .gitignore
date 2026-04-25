@@ -1,5 +1,5 @@
-# Debug screenshots from development
-*.png
+# Debug screenshots from development (root only — keep assets/ images)
+/*.png
 
 # Local testing artifacts
 .playwright-mcp/

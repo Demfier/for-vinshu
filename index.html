@@ -314,6 +314,8 @@
       border-radius: 50%;
       border: 1px solid var(--gold);
       box-shadow: inset 0 0 40px rgba(212, 162, 76, 0.2), 0 10px 30px rgba(107, 31, 43, 0.15);
+      transition: transform 1.4s cubic-bezier(0.4, 0.0, 0.2, 1), border-color 0.6s ease;
+      transform-origin: center center;
     }
 
     #mehndi-base {
@@ -326,6 +328,39 @@
       z-index: 2;
       border-color: transparent;
       box-shadow: none;
+    }
+
+    /* Chibi bride that appears once the mandala is fully revealed.
+       The mandala then shrinks toward her hand, "zooming out" so the
+       pattern reads as a design on her. */
+    .mehndi-bride {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 70%;
+      height: auto;
+      transform: translate(-50%, -50%) scale(0.55);
+      opacity: 0;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      z-index: 3;
+      filter: drop-shadow(0 6px 16px rgba(107, 31, 43, 0.25));
+      transition: opacity 1.4s ease, transform 1.4s cubic-bezier(0.34, 1.0, 0.6, 1.0);
+    }
+
+    .mehndi-wrap.revealed #mehndi-base,
+    .mehndi-wrap.revealed #mehndi-mask {
+      /* Shrink the mandala and slide it onto her right hand
+         (the empty one — bouquet is in the other hand) */
+      transform: translate(46%, 18%) scale(0.18);
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    .mehndi-wrap.revealed .mehndi-bride {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
     }
 
     .mehndi-progress {
@@ -832,13 +867,13 @@
       }
     }
 
-    /* Indian wedding couple (external SVG) */
+    /* Indian wedding couple — chibi illustration */
     .couple {
       position: absolute;
       left: 0;
       top: 0;
-      width: 110px;
-      height: 89px;
+      width: 120px;
+      height: 132px;
       filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.3));
       z-index: 3;
       pointer-events: none;
@@ -1253,18 +1288,19 @@
       }
     }
 
-    /* Bride emoji — shower target */
+    /* Chibi bride illustration — shower target */
     .haldi-bride {
       position: absolute;
       top: 12px;
       left: 50%;
+      width: clamp(120px, 28%, 160px);
+      height: auto;
       transform: translateX(-50%) scale(0.3);
-      font-size: 4.2rem;
-      line-height: 1;
       opacity: 0;
       transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
       pointer-events: none;
       user-select: none;
+      -webkit-user-drag: none;
       z-index: 3;
       filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.25));
     }
@@ -1547,7 +1583,7 @@
         <div class="stage-devanagari">हल्दी</div>
       </div>
       <div id="haldi-area">
-        <div class="haldi-bride" id="haldi-bride" aria-hidden="true">👧</div>
+        <img class="haldi-bride" id="haldi-bride" src="assets/haldi-bride.png" alt="" aria-hidden="true" draggable="false">
         <div class="haldi-basket" id="haldi-basket" aria-hidden="true">
           <div class="basket-body"></div>
           <div class="basket-rim"></div>
@@ -1567,9 +1603,10 @@
         <h2 class="stage-name">The Mehndi</h2>
         <div class="stage-devanagari">मेहंदी</div>
       </div>
-      <div class="mehndi-wrap">
+      <div class="mehndi-wrap" id="mehndi-wrap">
         <canvas id="mehndi-base" width="360" height="360" aria-hidden="true"></canvas>
         <canvas id="mehndi-mask" width="360" height="360" aria-label="Tap to reveal mehndi"></canvas>
+        <img class="mehndi-bride" id="mehndi-bride" src="assets/mehndi-bride.png" alt="" aria-hidden="true" draggable="false">
         <div class="mehndi-progress" id="mehndi-progress">Tap to reveal the mehndi · 0 / 12</div>
       </div>
     </div>
@@ -1635,7 +1672,7 @@
           <span class="ember e5"></span>
         </div>
         <div class="couple" id="couple" aria-label="Indian bride and groom">
-          <img src="indian_bride_and_groom.svg" alt="" class="couple-img" draggable="false" />
+          <img src="assets/couple.png" alt="" class="couple-img" draggable="false" />
         </div>
       </div>
       <div class="score-display" style="margin-top:12px; font-style:italic;">Guide the couple<br> around agni
@@ -2365,9 +2402,13 @@
         mask.style.transition = 'opacity 1.3s ease';
         mask.style.opacity = '0';
         document.getElementById('mehndi-progress').textContent = 'Beautiful ✨';
+        // Then zoom out — mandala shrinks to her hand, bride fades in around it
+        setTimeout(() => {
+          document.getElementById('mehndi-wrap').classList.add('revealed');
+        }, 900);
         setTimeout(() => {
           showTransition('A bride-to-be with the prettiest hands 🤎', nextStage);
-        }, 1900);
+        }, 3600);
       }
     }
 
@@ -2790,8 +2831,9 @@
       function updateCouple() {
         const cx = area.clientWidth / 2;
         const cy = area.clientHeight / 2;
-        const x = cx + Math.cos(pheraAngle) * radius - 55;
-        const y = cy + Math.sin(pheraAngle) * radius - 44;
+        // Couple is 120×132 — offset by half each axis to centre on the orbit point
+        const x = cx + Math.cos(pheraAngle) * radius - 60;
+        const y = cy + Math.sin(pheraAngle) * radius - 66;
         couple.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       }
       updateCouple();
