@@ -564,7 +564,7 @@
       height: 120px;
       --scale: 1;
       --offset-x: max(-180px, -30vw);
-      --offset-y: -100px;
+      --offset-y: -55px;
       transform: translate(-50%, -50%) translate(var(--offset-x), var(--offset-y)) scale(var(--scale));
       transform-origin: 50% 100%;
       transition: transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -2208,16 +2208,17 @@
       { name: 'Ni', deva: 'नि', freq: 493.88 }, // B4
     ];
     const SANGEET_TARGET = SAAT_SUR.length;
-    // Five distinct pose sprites of Vinshu — one per note, no tilt needed.
-    // Order roughly progresses idle → walk → run, scale grows for finale energy.
+    // Four distinct closed-mouth pose sprites of Vinshu — one per note.
+    // Order roughly progresses idle → walk → dance, scale grows for finale.
+    // (pose-5 has an open-mouth laugh that clashes with the others, skipped.)
     const DANCER_POSES = [
       'assets/sprites/bride-pose-1.png', // standing — Sa
       'assets/sprites/bride-pose-2.png', // walk left foot — Re
       'assets/sprites/bride-pose-3.png', // walk right foot — Ga
       'assets/sprites/bride-pose-4.png', // dance arm-extended — Ma
-      'assets/sprites/bride-pose-5.png', // running twirl — Pa
-      'assets/sprites/bride-pose-4.png', // dance arm-extended — Dha
-      'assets/sprites/bride-pose-5.png', // running twirl — Ni
+      'assets/sprites/bride-pose-2.png', // walk left foot — Pa
+      'assets/sprites/bride-pose-3.png', // walk right foot — Dha
+      'assets/sprites/bride-pose-4.png', // dance arm-extended — Ni
     ];
     const DANCER_SCALES = [1.00, 1.05, 1.10, 1.16, 1.22, 1.26, 1.32];
 
@@ -2242,14 +2243,14 @@
       if (!d) return;
       d.classList.add('center');
       d.style.setProperty('--scale', 1);
-      // Distinct poses in mixed order so consecutive frames never repeat
+      // Distinct closed-mouth poses in mixed order so consecutive frames never repeat
       const finaleOrder = [
         'assets/sprites/bride-pose-4.png',
         'assets/sprites/bride-pose-2.png',
-        'assets/sprites/bride-pose-5.png',
         'assets/sprites/bride-pose-3.png',
         'assets/sprites/bride-pose-4.png',
-        'assets/sprites/bride-pose-5.png',
+        'assets/sprites/bride-pose-2.png',
+        'assets/sprites/bride-pose-3.png',
       ];
       let i = 0;
       const id = setInterval(() => {
