@@ -322,24 +322,40 @@
       transition: opacity 1.3s ease;
     }
 
-    /* Bride sprite — starts zoomed into her left hand (viewer's right) so
-       the visible area reads as a close-up of the henna; on reveal scales
-       back to 1. transform-origin sits on the hand so scaling pivots around
-       it; the recenter translate is independent of scale. */
+    /* Close-up of a mehndi-decorated palm — fills the wrap during the
+       reveal phase, then fades out so the bride sprite can take over. */
+    .mehndi-closeup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: auto;
+      transform-origin: 50% 58%; /* palm center in source */
+      transform: translate(-50%, -50%) scale(1.55);
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      z-index: 1;
+      filter: drop-shadow(0 6px 16px rgba(107, 31, 43, 0.25));
+      transition: opacity 1.4s ease;
+    }
+
+    /* Bride sprite — hidden during the close-up, fades in once the
+       paste is gone so the reveal ends on a wide shot of the bride. */
     .mehndi-bride {
       position: absolute;
       top: 50%;
       left: 50%;
       width: 70%;
       height: auto;
-      transform-origin: 84.6% 66.7%; /* back-of-hand center in 408×525 sprite ≈ (345, 350) */
-      transform: translate(-34.5%, -16.7%) translate(-50%, -50%) scale(4.5);
+      transform: translate(-50%, -50%) scale(0.85);
+      opacity: 0;
       pointer-events: none;
       user-select: none;
       -webkit-user-drag: none;
       z-index: 1;
       filter: drop-shadow(0 6px 16px rgba(107, 31, 43, 0.25));
-      transition: transform 1.6s cubic-bezier(0.34, 1.0, 0.6, 1.0);
+      transition: opacity 1.4s ease, transform 1.4s cubic-bezier(0.34, 1.0, 0.6, 1.0);
     }
 
     .mehndi-wrap.revealed #mehndi-mask {
@@ -347,7 +363,12 @@
       pointer-events: none;
     }
 
+    .mehndi-wrap.revealed .mehndi-closeup {
+      opacity: 0;
+    }
+
     .mehndi-wrap.revealed .mehndi-bride {
+      opacity: 1;
       transform: translate(-50%, -50%) scale(1);
     }
 
@@ -526,13 +547,15 @@
       text-transform: uppercase;
     }
 
-    /* Vinshu dancing — cycles through 5 distinct pose sprites per beat */
+    /* Vinshu dancing — cycles through 5 distinct pose sprites per beat.
+       Height-locked (not width-locked) so each pose displays at the same
+       figure size regardless of source aspect ratio. */
     .sangeet-dancer {
       position: absolute;
       bottom: 8px;
       left: 50%;
-      width: 84px;
-      height: auto;
+      width: auto;
+      height: 150px;
       transform: translateX(-50%) scale(1);
       transform-origin: 50% 90%;
       transition: transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -1628,6 +1651,8 @@
         <div class="stage-devanagari">मेहंदी</div>
       </div>
       <div class="mehndi-wrap" id="mehndi-wrap">
+        <img class="mehndi-closeup" id="mehndi-closeup" src="assets/sprites/mehndi-hand.png" alt=""
+          aria-hidden="true" draggable="false">
         <img class="mehndi-bride" id="mehndi-bride" src="assets/sprites/bride-mehndi.png" alt="" aria-hidden="true"
           draggable="false">
         <canvas id="mehndi-mask" width="360" height="360" aria-label="Tap to reveal mehndi"></canvas>
@@ -2700,6 +2725,14 @@
         p.addEventListener('animationend', () => p.remove());
       }, 1400);
     }
+
+    /* Pre-draw the henna paste so the close-up palm doesn't flash bare
+       when the mehndi stage activates (the canvas is empty until startMehndi
+       runs, and that lag is visible on slower phones). */
+    document.addEventListener('DOMContentLoaded', () => {
+      const mask = document.getElementById('mehndi-mask');
+      if (mask) drawMehndiMask(mask.getContext('2d'));
+    });
 
   </script>
 </body>
