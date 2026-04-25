@@ -1239,24 +1239,6 @@
       box-shadow: 0 6px 18px rgba(107, 31, 43, 0.45);
     }
 
-    .handoff-skip {
-      font-family: 'Marcellus', serif;
-      font-size: 0.95rem;
-      letter-spacing: 0.06em;
-      color: var(--maroon);
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      opacity: 0.7;
-      padding: 4px 12px;
-    }
-
-    .handoff-skip:hover,
-    .handoff-skip:focus-visible {
-      opacity: 1;
-      outline: none;
-    }
-
     .petal {
       position: fixed;
       top: -30px;
@@ -2868,25 +2850,22 @@
       const overlay = document.createElement('div');
       overlay.className = 'recording-handoff';
       overlay.innerHTML = `
-        <div class="handoff-message">couldn't sing it for you in person — recorded this 🎵</div>
+        <div class="handoff-message">now enjoy this 🎵</div>
         <button type="button" class="handoff-btn" id="handoff-play">
-          <span aria-hidden="true">▶</span>&nbsp;listen
+          <span aria-hidden="true">▶</span>&nbsp;play
         </button>
-        <button type="button" class="handoff-skip" id="handoff-skip">skip →</button>
       `;
       document.body.appendChild(overlay);
       requestAnimationFrame(() => overlay.classList.add('visible'));
 
-      const finish = (withAudio) => {
-        if (withAudio) playRecording();
+      overlay.querySelector('#handoff-play').addEventListener('click', () => {
+        playRecording();
         overlay.classList.remove('visible');
         setTimeout(() => {
           overlay.remove();
           callback();
         }, 600);
-      };
-      overlay.querySelector('#handoff-play').addEventListener('click', () => finish(true));
-      overlay.querySelector('#handoff-skip').addEventListener('click', () => finish(false));
+      });
     }
 
     function setupRecordingButton() {
