@@ -1157,7 +1157,11 @@
 
     .play-recording-row {
       margin-top: 12px;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .play-recording {
@@ -1237,6 +1241,98 @@
       outline: none;
       transform: translateY(-1px);
       box-shadow: 0 6px 18px rgba(107, 31, 43, 0.45);
+    }
+
+    /* Singing screen — Sunny sprite with concentric sound waves while
+       the recording plays. Auto-advances after a few seconds; the audio
+       continues across stages. */
+    .singing-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(253, 244, 227, 0.98), rgba(244, 168, 37, 0.7));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      z-index: 200;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .singing-screen.visible {
+      opacity: 1;
+    }
+
+    .sunny-sprite-stage {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sunny-sprite-stage .sunny-sprite {
+      height: 240px;
+      width: auto;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 8px 20px rgba(107, 31, 43, 0.3));
+      animation: sunnyBob 2.2s ease-in-out infinite;
+    }
+
+    @keyframes sunnyBob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(-1deg); }
+    }
+
+    .sound-waves {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .sound-waves .wave {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200px;
+      height: 200px;
+      margin: -100px 0 0 -100px;
+      border-radius: 50%;
+      border: 3px solid var(--maroon);
+      opacity: 0;
+      animation: soundWave 2.4s ease-out infinite;
+    }
+
+    .sound-waves .wave:nth-child(1) { animation-delay: 0s; }
+    .sound-waves .wave:nth-child(2) { animation-delay: 0.6s; }
+    .sound-waves .wave:nth-child(3) { animation-delay: 1.2s; }
+    .sound-waves .wave:nth-child(4) { animation-delay: 1.8s; }
+
+    @keyframes soundWave {
+      0%   { transform: scale(0.5); opacity: 0; border-width: 4px; }
+      15%  { opacity: 0.55; }
+      100% { transform: scale(2.4); opacity: 0; border-width: 1px; }
+    }
+
+    .singing-caption {
+      font-family: 'Tangerine', cursive;
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      color: var(--maroon);
+      margin-top: 4px;
+    }
+
+    /* Sunny inset next to the 'play it again' button in the finale letter */
+    .signature-sprite {
+      height: 56px;
+      width: auto;
+      vertical-align: middle;
+      filter: drop-shadow(0 2px 4px rgba(107, 31, 43, 0.2));
     }
 
     .petal {
@@ -1862,6 +1958,7 @@
         </p>
         <div class="signature">— your Sunny bhaiya</div>
         <div class="play-recording-row">
+          <img class="signature-sprite" src="assets/sprites/sunny.png" alt="" aria-hidden="true" draggable="false">
           <button type="button" class="play-recording" id="play-recording" aria-label="Play recording">
             <span class="play-icon" aria-hidden="true">▶</span>
             <span class="play-label">play it again</span>
@@ -2863,9 +2960,47 @@
         overlay.classList.remove('visible');
         setTimeout(() => {
           overlay.remove();
-          callback();
+          // Hand off to the singing screen — sprite + sound waves while
+          // the recording carries on. Auto-advances after a few seconds.
+          showSingingScreen(callback);
         }, 600);
       });
+    }
+
+    // Sunny sprite at center, sound waves radiating, while the recording
+    // plays. Holds for ~7 seconds, then advances. Tap anywhere to skip.
+    function showSingingScreen(callback) {
+      const overlay = document.createElement('div');
+      overlay.className = 'singing-screen';
+      overlay.innerHTML = `
+        <div class="sunny-sprite-stage">
+          <div class="sound-waves">
+            <span class="wave"></span>
+            <span class="wave"></span>
+            <span class="wave"></span>
+            <span class="wave"></span>
+          </div>
+          <img class="sunny-sprite" src="assets/sprites/sunny.png" alt="" aria-hidden="true" draggable="false">
+        </div>
+        <div class="singing-caption">singing for you 🎵</div>
+      `;
+      document.body.appendChild(overlay);
+      requestAnimationFrame(() => overlay.classList.add('visible'));
+
+      let dismissed = false;
+      const dismiss = () => {
+        if (dismissed) return;
+        dismissed = true;
+        overlay.classList.remove('visible');
+        setTimeout(() => {
+          overlay.remove();
+          callback();
+        }, 600);
+      };
+      // Tap-anywhere skip
+      overlay.addEventListener('click', dismiss);
+      // Auto-advance after 7s — the recording continues across stages
+      setTimeout(dismiss, 7000);
     }
 
     function setupRecordingButton() {
