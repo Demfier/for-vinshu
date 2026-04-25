@@ -296,21 +296,14 @@
       letter-spacing: 0.1em;
     }
 
-    /* ----------- STAGE 2: MEHNDI (zoom-out reveal: hand → full bride) ----------- */
+    /* ----------- STAGE 2: MEHNDI (mandala reveal → zooms out, bride fades in) ----------- */
     .mehndi-wrap {
       position: relative;
       width: min(360px, 86vw);
       aspect-ratio: 1 / 1;
-      overflow: hidden;
-      border-radius: 50%;
-      border: 1px solid var(--gold);
-      box-shadow: inset 0 0 40px rgba(212, 162, 76, 0.2), 0 10px 30px rgba(107, 31, 43, 0.15);
     }
 
-    #mehndi-base {
-      display: none; /* legacy canvas — kept in DOM so JS can grab it but unused */
-    }
-
+    #mehndi-base,
     #mehndi-mask {
       position: absolute;
       top: 0;
@@ -318,33 +311,57 @@
       display: block;
       width: 100%;
       height: 100%;
+      border-radius: 50%;
+      border: 1px solid var(--gold);
+      box-shadow: inset 0 0 40px rgba(212, 162, 76, 0.2), 0 10px 30px rgba(107, 31, 43, 0.15);
+      transition: transform 1.4s cubic-bezier(0.4, 0.0, 0.2, 1), border-color 0.6s ease;
+      transform-origin: center center;
+    }
+
+    #mehndi-base {
+      z-index: 1;
+    }
+
+    #mehndi-mask {
       cursor: pointer;
       touch-action: none;
       z-index: 2;
+      border-color: transparent;
+      box-shadow: none;
     }
 
-    /* Bride sprite: starts zoomed in on her right palm so the visible mehndi
-       pattern from the sprite reads as the "reveal target". User taps clear
-       paste from the mask, exposing the henna underneath. After all taps,
-       camera zooms out to the full bride.
-       The translate(-75%, -57%) lines her right palm (75%/57% of the image)
-       up with the wrap center; scale(4) zooms in tight on it. */
+    /* Bride sprite that fades in once the mandala is revealed. The mandala
+       then shrinks onto her hand — camera "zooms out" from a close-up of
+       the henna pattern to the full bride. */
     .mehndi-bride {
       position: absolute;
       top: 50%;
       left: 50%;
       width: 70%;
       height: auto;
-      transform: translate(-82%, -72%) scale(4);
-      transform-origin: 82% 72%;
+      transform: translate(-50%, -50%) scale(0.55);
+      opacity: 0;
       pointer-events: none;
       user-select: none;
       -webkit-user-drag: none;
-      z-index: 1;
-      transition: transform 1.5s cubic-bezier(0.34, 1.0, 0.6, 1.0);
+      z-index: 3;
+      filter: drop-shadow(0 6px 16px rgba(107, 31, 43, 0.25));
+      transition: opacity 1.4s ease, transform 1.4s cubic-bezier(0.34, 1.0, 0.6, 1.0);
+    }
+
+    .mehndi-wrap.revealed #mehndi-base,
+    .mehndi-wrap.revealed #mehndi-mask {
+      /* Shrink the mandala and slide it onto her right palm.
+         Bride is centered (scale 1, translate -50% -50%); her palm sits
+         ~18% right and 20% below the wrap center. */
+      transform: translate(18%, 20%) scale(0.13);
+      border-color: transparent;
+      box-shadow: none;
+      z-index: 4;
     }
 
     .mehndi-wrap.revealed .mehndi-bride {
+      opacity: 1;
       transform: translate(-50%, -50%) scale(1);
     }
 
@@ -559,12 +576,12 @@
       position: absolute;
       left: 50%;
       top: 50%;
-      transform: translate(-50%, -50%) scale(0.78);
+      transform: translate(-50%, -50%) scale(0.6);
       transform-origin: center center;
       width: 170px;
       height: 160px;
       pointer-events: none;
-      filter: drop-shadow(0 0 30px rgba(255, 130, 0, 0.55));
+      filter: drop-shadow(0 0 28px rgba(255, 130, 0, 0.55));
     }
 
     .kund-base {
@@ -859,8 +876,8 @@
       position: absolute;
       left: 0;
       top: 0;
-      width: 132px;
-      height: 130px;
+      width: 120px;
+      height: 135px;
       filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.3));
       z-index: 3;
       pointer-events: none;
@@ -2013,10 +2030,11 @@
     let mehndiDone = false;
 
     function startMehndi() {
+      const base = document.getElementById('mehndi-base');
       const mask = document.getElementById('mehndi-mask');
-      // mehndi-base is no longer drawn — the bride sprite IS the underlying art
+      drawMehndiBase(base.getContext('2d'));
       drawMehndiMask(mask.getContext('2d'));
-      // Reset zoom on replay
+      // Reset reveal/zoom on replay
       document.getElementById('mehndi-wrap').classList.remove('revealed');
       // Reset mask opacity in case a previous playthrough faded it
       mask.style.transition = 'none';
@@ -2348,13 +2366,12 @@
       });
 
       // Little "tap here" cue dots around the circle, subtly visible
-      // Cue dots clustered around where her right palm sits when zoomed in
-      // (palm is at ≈ (235, 206) in canvas coords because of transform-origin).
+      // Cue dots — spread to encourage taps across the pattern
       ctx.fillStyle = 'rgba(107, 47, 20, 0.22)';
       const cues = [
-        [180, 180], [220, 200], [250, 180], [200, 230], [240, 250],
-        [160, 160], [200, 140], [260, 220], [180, 220], [220, 160],
-        [140, 200], [280, 180], [240, 130],
+        [180, 180], [180, 100], [260, 180], [180, 260], [100, 180],
+        [232, 128], [232, 232], [128, 232], [128, 128],
+        [180, 40], [320, 180], [180, 320], [40, 180],
       ];
       cues.forEach(([x, y]) => {
         ctx.beginPath();
@@ -2820,9 +2837,9 @@
       function updateCouple() {
         const cx = area.clientWidth / 2;
         const cy = area.clientHeight / 2;
-        // Couple is 132×130 — offset by half each axis to centre on the orbit point
-        const x = cx + Math.cos(pheraAngle) * radius - 66;
-        const y = cy + Math.sin(pheraAngle) * radius - 65;
+        // Couple is 120×135 — offset by half each axis to centre on the orbit point
+        const x = cx + Math.cos(pheraAngle) * radius - 60;
+        const y = cy + Math.sin(pheraAngle) * radius - 67;
         couple.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       }
       updateCouple();
