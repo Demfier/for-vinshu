@@ -1349,7 +1349,8 @@
       position: absolute;
       bottom: 10px;
       left: 50%;
-      transform: translateX(-50%) rotate(0deg);
+      transform: translateX(-50%) scale(0.78);
+      transform-origin: 50% 100%;
       width: 100px;
       height: 90px;
       pointer-events: none;
@@ -2145,6 +2146,9 @@
 
     function haldiVictory() {
       const bride = document.getElementById('haldi-bride');
+      // Clear any flowers still mid-fall — they'd otherwise glitch
+      // through the bride / shower animation as background noise.
+      document.querySelectorAll('#haldi-area .falling:not([data-caught])').forEach(el => el.remove());
       bride.classList.add('visible');
       playShringaarSound();
       // Give the bride a moment to appear, then tip the basket and shower her
