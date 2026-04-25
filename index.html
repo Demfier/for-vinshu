@@ -1155,6 +1155,39 @@
       font-weight: 700;
     }
 
+    .play-recording-row {
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .play-recording {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-family: 'Marcellus', serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.06em;
+      color: var(--deep-marigold);
+      background: rgba(244, 168, 37, 0.10);
+      border: 1px solid var(--gold);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.25s ease, transform 0.2s ease;
+    }
+
+    .play-recording:hover,
+    .play-recording:focus-visible {
+      background: rgba(244, 168, 37, 0.20);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .play-recording .play-icon {
+      font-size: 0.85rem;
+      color: var(--maroon);
+    }
+
     .petal {
       position: fixed;
       top: -30px;
@@ -1777,6 +1810,12 @@
           God bless you both.
         </p>
         <div class="signature">— your Sunny bhaiya</div>
+        <div class="play-recording-row">
+          <button type="button" class="play-recording" id="play-recording" aria-label="Play recording">
+            <span class="play-icon" aria-hidden="true">▶</span>
+            <span class="play-label">play your dada's song</span>
+          </button>
+        </div>
       </div>
       <div class="fade-in" style="animation-delay: 2.5s; margin-top: 24px;">
         <div class="ornament">✦</div>
@@ -1784,6 +1823,8 @@
     </div>
 
   </div>
+
+  <audio id="tumsehi-audio" preload="auto" src="assets/audio/tumsehi.mp3"></audio>
 
   <script>
     /* =================== NAVIGATION =================== */
@@ -2243,6 +2284,9 @@
       if (!d) return;
       d.classList.add('center');
       d.style.setProperty('--scale', 1);
+      // Hand off from the synth saat sur to Sunny bhaiya's recording
+      stopAmbient();
+      playRecording();
       // Distinct closed-mouth poses in mixed order so consecutive frames never repeat
       const finaleOrder = [
         'assets/sprites/bride-pose-4.png',
@@ -2344,6 +2388,10 @@
     let ambientNodes = null;
 
     function startAmbient(config) {
+      // The recorded "tumsehi" track (Sunny bhaiya's voice) takes over once
+      // sangeet ends — don't overlay any synth ambient on top of it.
+      const rec = document.getElementById('tumsehi-audio');
+      if (rec && !rec.paused && !rec.ended) return;
       stopAmbient();
       const ctx = ensureAudio();
       if (!ctx) return;
@@ -2726,9 +2774,51 @@
       }, 1800);
     }
 
+    /* =================== TUMSEHI RECORDING =================== */
+    // Sunny bhaiya's recording — kicks in at sangeet victory, can be
+    // replayed from the finale letter. Playing this suppresses any synth
+    // ambient (startAmbient bails out while it's running).
+    function playRecording() {
+      const rec = document.getElementById('tumsehi-audio');
+      if (!rec) return;
+      try {
+        rec.currentTime = 0;
+        const p = rec.play();
+        if (p && p.catch) p.catch(() => { /* autoplay blocked — user can use the button */ });
+      } catch (_) { /* ignore */ }
+    }
+
+    function setupRecordingButton() {
+      const btn = document.getElementById('play-recording');
+      const rec = document.getElementById('tumsehi-audio');
+      if (!btn || !rec || btn.dataset.wired) return;
+      btn.dataset.wired = '1';
+      const icon = btn.querySelector('.play-icon');
+      const label = btn.querySelector('.play-label');
+      const setUI = (playing) => {
+        btn.classList.toggle('playing', playing);
+        if (icon) icon.textContent = playing ? '⏸' : '▶';
+        if (label) label.textContent = playing ? 'pause' : "play your dada's song";
+      };
+      btn.addEventListener('click', () => {
+        if (rec.paused || rec.ended) {
+          rec.currentTime = 0;
+          rec.play().catch(() => { });
+        } else {
+          rec.pause();
+        }
+      });
+      rec.addEventListener('play', () => setUI(true));
+      rec.addEventListener('pause', () => setUI(false));
+      rec.addEventListener('ended', () => setUI(false));
+    }
+
     /* =================== FINALE =================== */
     function startFinale() {
-      // Gentle music beneath the letter
+      setupRecordingButton();
+      // Gentle music beneath the letter — but only if Sunny bhaiya's
+      // recording from sangeet has already finished. startAmbient self-
+      // checks and bails out if the recording is still running.
       startAmbient(AMBIENT_FINALE);
       // Rain petals — CSS animation handles motion on the GPU
       const petals = ['🌸', '🌺', '🌼', '🌷', '💐', '❦', '✦'];
