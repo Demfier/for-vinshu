@@ -352,10 +352,15 @@
     .mehndi-wrap.revealed #mehndi-base,
     .mehndi-wrap.revealed #mehndi-mask {
       /* Shrink the mandala and slide it onto her right hand
-         (the empty one — bouquet is in the other hand) */
-      transform: translate(46%, 18%) scale(0.18);
+         (the empty one — bouquet is in the other hand).
+         The bride is centered at scale(1); her right hand sits
+         ~7% right and ~14% below wrap-center.
+         Lift z-index above the bride (3) so the pattern reads as
+         a decoration ON her hand, not behind her body. */
+      transform: translate(20%, 36%) scale(0.10);
       border-color: transparent;
       box-shadow: none;
+      z-index: 4;
     }
 
     .mehndi-wrap.revealed .mehndi-bride {
