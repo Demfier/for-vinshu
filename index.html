@@ -296,14 +296,21 @@
       letter-spacing: 0.1em;
     }
 
-    /* ----------- STAGE 2: MEHNDI (layered canvas, tap-to-reveal) ----------- */
+    /* ----------- STAGE 2: MEHNDI (zoom-out reveal: hand → full bride) ----------- */
     .mehndi-wrap {
       position: relative;
       width: min(360px, 86vw);
       aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 50%;
+      border: 1px solid var(--gold);
+      box-shadow: inset 0 0 40px rgba(212, 162, 76, 0.2), 0 10px 30px rgba(107, 31, 43, 0.15);
     }
 
-    #mehndi-base,
+    #mehndi-base {
+      display: none; /* legacy canvas — kept in DOM so JS can grab it but unused */
+    }
+
     #mehndi-mask {
       position: absolute;
       top: 0;
@@ -311,60 +318,33 @@
       display: block;
       width: 100%;
       height: 100%;
-      border-radius: 50%;
-      border: 1px solid var(--gold);
-      box-shadow: inset 0 0 40px rgba(212, 162, 76, 0.2), 0 10px 30px rgba(107, 31, 43, 0.15);
-      transition: transform 1.4s cubic-bezier(0.4, 0.0, 0.2, 1), border-color 0.6s ease;
-      transform-origin: center center;
-    }
-
-    #mehndi-base {
-      z-index: 1;
-    }
-
-    #mehndi-mask {
       cursor: pointer;
       touch-action: none;
       z-index: 2;
-      border-color: transparent;
-      box-shadow: none;
     }
 
-    /* Chibi bride that appears once the mandala is fully revealed.
-       The mandala then shrinks toward her hand, "zooming out" so the
-       pattern reads as a design on her. */
+    /* Bride sprite: starts zoomed in on her right palm so the visible mehndi
+       pattern from the sprite reads as the "reveal target". User taps clear
+       paste from the mask, exposing the henna underneath. After all taps,
+       camera zooms out to the full bride.
+       The translate(-75%, -57%) lines her right palm (75%/57% of the image)
+       up with the wrap center; scale(4) zooms in tight on it. */
     .mehndi-bride {
       position: absolute;
       top: 50%;
       left: 50%;
       width: 70%;
       height: auto;
-      transform: translate(-50%, -50%) scale(0.55);
-      opacity: 0;
+      transform: translate(-82%, -72%) scale(4);
+      transform-origin: 82% 72%;
       pointer-events: none;
       user-select: none;
       -webkit-user-drag: none;
-      z-index: 3;
-      filter: drop-shadow(0 6px 16px rgba(107, 31, 43, 0.25));
-      transition: opacity 1.4s ease, transform 1.4s cubic-bezier(0.34, 1.0, 0.6, 1.0);
-    }
-
-    .mehndi-wrap.revealed #mehndi-base,
-    .mehndi-wrap.revealed #mehndi-mask {
-      /* Shrink the mandala and slide it onto her right hand
-         (the empty one — bouquet is in the other hand).
-         The bride is centered at scale(1); her right hand sits
-         ~7% right and ~14% below wrap-center.
-         Lift z-index above the bride (3) so the pattern reads as
-         a decoration ON her hand, not behind her body. */
-      transform: translate(22%, 22%) scale(0.10);
-      border-color: transparent;
-      box-shadow: none;
-      z-index: 4;
+      z-index: 1;
+      transition: transform 1.5s cubic-bezier(0.34, 1.0, 0.6, 1.0);
     }
 
     .mehndi-wrap.revealed .mehndi-bride {
-      opacity: 1;
       transform: translate(-50%, -50%) scale(1);
     }
 
@@ -543,17 +523,19 @@
       text-transform: uppercase;
     }
 
-    /* The dancer below the falling notes — same person, different poses per beat */
+    /* Vinshu dancing — alternates between two pose sprites per beat */
     .sangeet-dancer {
       position: absolute;
-      bottom: 14px;
+      bottom: 8px;
       left: 50%;
-      font-size: 3.4rem;
-      line-height: 1;
+      width: 84px;
+      height: auto;
       transform: translateX(-50%) scale(1) rotate(0deg);
       transform-origin: 50% 90%;
       transition: transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
       filter: drop-shadow(0 4px 10px rgba(107, 31, 43, 0.35));
       will-change: transform;
     }
@@ -877,8 +859,8 @@
       position: absolute;
       left: 0;
       top: 0;
-      width: 140px;
-      height: 128px;
+      width: 132px;
+      height: 130px;
       filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.3));
       z-index: 3;
       pointer-events: none;
@@ -1630,7 +1612,7 @@
           <span id="sangeet-hits">Caught: 0 / 7</span>
           <span id="sangeet-next" class="sangeet-next">Next: <strong>सा</strong> Sa</span>
         </div>
-        <div class="sangeet-dancer" id="sangeet-dancer" aria-hidden="true">💃</div>
+        <img class="sangeet-dancer" id="sangeet-dancer" src="assets/sprites/bride-pose-1.png" alt="" aria-hidden="true" draggable="false">
         <div class="hit-flash" id="hit-flash"></div>
         <div class="miss-flash" id="miss-flash"></div>
       </div>
@@ -2031,10 +2013,11 @@
     let mehndiDone = false;
 
     function startMehndi() {
-      const base = document.getElementById('mehndi-base');
       const mask = document.getElementById('mehndi-mask');
-      drawMehndiBase(base.getContext('2d'));
+      // mehndi-base is no longer drawn — the bride sprite IS the underlying art
       drawMehndiMask(mask.getContext('2d'));
+      // Reset zoom on replay
+      document.getElementById('mehndi-wrap').classList.remove('revealed');
       // Reset mask opacity in case a previous playthrough faded it
       mask.style.transition = 'none';
       mask.style.opacity = '1';
@@ -2365,11 +2348,13 @@
       });
 
       // Little "tap here" cue dots around the circle, subtly visible
+      // Cue dots clustered around where her right palm sits when zoomed in
+      // (palm is at ≈ (235, 206) in canvas coords because of transform-origin).
       ctx.fillStyle = 'rgba(107, 47, 20, 0.22)';
       const cues = [
-        [180, 180], [180, 100], [260, 180], [180, 260], [100, 180],
-        [232, 128], [232, 232], [128, 232], [128, 128],
-        [180, 40], [320, 180], [180, 320], [40, 180],
+        [180, 180], [220, 200], [250, 180], [200, 230], [240, 250],
+        [160, 160], [200, 140], [260, 220], [180, 220], [220, 160],
+        [140, 200], [280, 180], [240, 130],
       ];
       cues.forEach(([x, y]) => {
         ctx.beginPath();
@@ -2436,56 +2421,53 @@
       { name: 'Ni', deva: 'नि', freq: 493.88 }, // B4
     ];
     const SANGEET_TARGET = SAAT_SUR.length;
-    // Two poses for the same 💃: facing right (scaleX +1) and facing left (scaleX -1).
-    // Each beat picks a pose AND a tilt, so the dancer mirrors AND leans every time.
-    // Pose × tilt gives genuinely different visual states from one emoji.
-    const DANCER_FACINGS = [+1, -1, +1, -1, +1, -1, +1];
+    // Two pose sprites of Vinshu — alternated per note with tilt + scale variations
+    // so each beat reads as a distinct dance pose.
+    const DANCER_POSES = [
+      'assets/sprites/bride-pose-1.png',
+      'assets/sprites/bride-pose-2.png',
+    ];
     const DANCER_TILTS = [
       'rotate(0deg)',                     // Sa  — upright
-      'rotate(-12deg) translateY(-3px)',  // Re  — mirror, lean left
-      'rotate(15deg)  translateY(-3px)',  // Ga  — original, lean right
-      'rotate(-22deg) translateY(-10px)', // Ma  — mirror, leap left
-      'rotate(20deg)',                    // Pa  — original, sway hard
-      'rotate(-14deg) translateY(-14px)', // Dha — mirror, big leap
-      'rotate(10deg)  translateY(-10px)', // Ni  — original, finale
+      'rotate(-10deg) translateY(-3px)',  // Re  — lean left
+      'rotate(10deg)  translateY(-3px)',  // Ga  — lean right
+      'rotate(-15deg) translateY(-10px)', // Ma  — leap left
+      'rotate(14deg)  translateY(-4px)',  // Pa  — sway right + lift
+      'rotate(-10deg) translateY(-14px)', // Dha — big leap
+      'rotate(8deg)   translateY(-10px)', // Ni  — finale flourish
     ];
-    const DANCER_SCALES = [1.00, 1.05, 1.10, 1.18, 1.10, 1.22, 1.32];
-
-    function dancerTransform(idx) {
-      const facing = DANCER_FACINGS[idx] ?? 1;
-      const scale = DANCER_SCALES[idx] ?? 1;
-      const tilt = DANCER_TILTS[idx] ?? 'rotate(0deg)';
-      // scale(x, y) — flip x to mirror, keep y intact
-      return `translateX(-50%) scale(${scale * facing}, ${scale}) ${tilt}`;
-    }
+    const DANCER_SCALES = [1.00, 1.04, 1.08, 1.14, 1.10, 1.20, 1.28];
 
     function setDancerPose(idx) {
       const d = document.getElementById('sangeet-dancer');
       if (!d) return;
-      d.textContent = '💃';
-      d.style.transform = dancerTransform(idx);
+      const src = DANCER_POSES[idx % DANCER_POSES.length];
+      if (!d.src.endsWith(src)) d.src = src;
+      const scale = DANCER_SCALES[idx] ?? 1;
+      const tilt  = DANCER_TILTS[idx]  ?? 'rotate(0deg)';
+      d.style.transform = `translateX(-50%) scale(${scale}) ${tilt}`;
     }
     function resetDancer() {
       const d = document.getElementById('sangeet-dancer');
       if (!d) return;
-      d.textContent = '💃';
-      d.style.transform = `translateX(-50%) scale(1, 1) rotate(0deg)`;
+      d.src = DANCER_POSES[0];
+      d.style.transform = 'translateX(-50%) scale(1) rotate(0deg)';
     }
-    // After Ni, cycle the tilts without flipping — facing right throughout.
-    // Mirroring at this rapid pace felt like spinning rather than dancing.
+    // After Ni, alternate the two poses rapidly with growing tilts — finale dance
     function dancerVictoryCycle() {
       const d = document.getElementById('sangeet-dancer');
       if (!d) return;
       const finaleTilts = [
-        'rotate(-18deg) translateY(-8px)',
-        'rotate(20deg)  translateY(-8px)',
-        'rotate(-12deg) translateY(-16px)',
-        'rotate(15deg)  translateY(-16px)',
+        'rotate(-14deg) translateY(-8px)',
+        'rotate(14deg)  translateY(-8px)',
+        'rotate(-10deg) translateY(-16px)',
+        'rotate(10deg)  translateY(-16px)',
       ];
       let i = 0;
       const id = setInterval(() => {
+        d.src = DANCER_POSES[i % DANCER_POSES.length];
         const tilt = finaleTilts[i % finaleTilts.length];
-        d.style.transform = `translateX(-50%) scale(1.3, 1.3) ${tilt}`;
+        d.style.transform = `translateX(-50%) scale(1.25) ${tilt}`;
         i++;
         if (i >= 14) clearInterval(id); // ~2.8s of dancing at 200ms per swap
       }, 200);
@@ -2832,15 +2814,15 @@
 
       const area = document.getElementById('pheras-area');
       const couple = document.getElementById('couple');
-      const radius = 130;
+      const radius = 110;
 
       let rafPending = false;
       function updateCouple() {
         const cx = area.clientWidth / 2;
         const cy = area.clientHeight / 2;
-        // Couple is 140×128 — offset by half each axis to centre on the orbit point
-        const x = cx + Math.cos(pheraAngle) * radius - 70;
-        const y = cy + Math.sin(pheraAngle) * radius - 64;
+        // Couple is 132×130 — offset by half each axis to centre on the orbit point
+        const x = cx + Math.cos(pheraAngle) * radius - 66;
+        const y = cy + Math.sin(pheraAngle) * radius - 65;
         couple.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       }
       updateCouple();
