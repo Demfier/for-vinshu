@@ -323,15 +323,19 @@
     }
 
     /* Close-up of a mehndi-decorated palm — fills the wrap during the
-       reveal phase, then fades out so the bride sprite can take over. */
+       reveal phase focused on the palm-center medallion, then fades
+       out so the bride sprite can take over. Source 720×1405 with the
+       palm medallion at (350, 580) ≈ 48.6% × 41.3%. */
     .mehndi-closeup {
       position: absolute;
       top: 50%;
       left: 50%;
       width: 100%;
       height: auto;
-      transform-origin: 50% 58%; /* palm center in source */
-      transform: translate(-50%, -50%) scale(1.55);
+      transform-origin: 44.4% 38.8%;
+      /* Recenter shift moves the medallion (44.4% × 38.8% in source) to
+         wrap center; scale then zooms around it. */
+      transform: translate(5.6%, 11.2%) translate(-50%, -50%) scale(1.4);
       pointer-events: none;
       user-select: none;
       -webkit-user-drag: none;
@@ -548,22 +552,35 @@
     }
 
     /* Vinshu dancing — cycles through 5 distinct pose sprites per beat.
-       Height-locked (not width-locked) so each pose displays at the same
-       figure size regardless of source aspect ratio. */
+       Height-locked (not width-locked) so each pose renders at the same
+       figure size. During gameplay she dances in the top-right corner
+       (out of the way of falling notes); after Ni the .center modifier
+       moves her to the middle for the finale. */
     .sangeet-dancer {
       position: absolute;
-      bottom: 8px;
+      top: 50%;
       left: 50%;
       width: auto;
-      height: 150px;
-      transform: translateX(-50%) scale(1);
-      transform-origin: 50% 90%;
-      transition: transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
+      height: 120px;
+      --scale: 1;
+      --offset-x: min(180px, 30vw);
+      --offset-y: -120px;
+      transform: translate(-50%, -50%) translate(var(--offset-x), var(--offset-y)) scale(var(--scale));
+      transform-origin: 50% 100%;
+      transition: transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: none;
       user-select: none;
       -webkit-user-drag: none;
       filter: drop-shadow(0 4px 10px rgba(107, 31, 43, 0.35));
       will-change: transform;
+    }
+
+    /* Victory state — bride moves to the center of the box for the
+       finale dance after Ni. */
+    .sangeet-dancer.center {
+      --offset-x: 0px;
+      --offset-y: 0px;
+      height: 150px;
     }
 
     /* ----------- STAGE 4: PHERAS ----------- */
@@ -2210,18 +2227,21 @@
       const src = DANCER_POSES[idx % DANCER_POSES.length];
       if (!d.src.endsWith(src)) d.src = src;
       const scale = DANCER_SCALES[idx] ?? 1;
-      d.style.transform = `translateX(-50%) scale(${scale})`;
+      d.style.setProperty('--scale', scale);
     }
     function resetDancer() {
       const d = document.getElementById('sangeet-dancer');
       if (!d) return;
+      d.classList.remove('center');
       d.src = DANCER_POSES[0];
-      d.style.transform = 'translateX(-50%) scale(1)';
+      d.style.setProperty('--scale', 1);
     }
-    // After Ni, cycle through every distinct pose rapidly — finale dance
+    // After Ni, move dancer to box center and cycle through distinct poses
     function dancerVictoryCycle() {
       const d = document.getElementById('sangeet-dancer');
       if (!d) return;
+      d.classList.add('center');
+      d.style.setProperty('--scale', 1);
       // Distinct poses in mixed order so consecutive frames never repeat
       const finaleOrder = [
         'assets/sprites/bride-pose-4.png',
@@ -2234,7 +2254,6 @@
       let i = 0;
       const id = setInterval(() => {
         d.src = finaleOrder[i % finaleOrder.length];
-        d.style.transform = 'translateX(-50%) scale(1.32)';
         i++;
         if (i >= 14) clearInterval(id); // ~2.8s of dancing at 200ms per swap
       }, 200);
