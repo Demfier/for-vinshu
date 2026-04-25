@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>For Vinshu, with love ✦</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%22 y=%2282%22 font-size=%2296%22 text-anchor=%22middle%22 fill=%22%23d4a24c%22>✦</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%22 y=%2282%22 font-size=%2296%22 text-anchor=%22middle%22 fill=%22%23d4a24c%22>✦</text></svg>">
   <meta name="description" content="A little something, on her wedding day.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="For Vinshu">
@@ -264,8 +265,11 @@
       will-change: transform;
       animation: falling-drop var(--fall-dur, 3s) linear forwards;
     }
+
     @keyframes falling-drop {
-      to { transform: translateY(var(--fall-dist, 420px)); }
+      to {
+        transform: translateY(var(--fall-dist, 420px));
+      }
     }
 
     .caught {
@@ -381,8 +385,11 @@
       will-change: transform;
       animation: note-fall var(--note-dur, 3.5s) linear forwards;
     }
+
     @keyframes note-fall {
-      to { transform: translateY(var(--note-dist, 500px)); }
+      to {
+        transform: translateY(var(--note-dist, 500px));
+      }
     }
 
     .note-beat .note-deva {
@@ -431,21 +438,27 @@
     .note-beat.n0 {
       background: radial-gradient(circle, #fff0cc 0%, #e6b45c 88%);
     }
+
     .note-beat.n1 {
       background: radial-gradient(circle, #ffdc9e 0%, #d98d32 88%);
     }
+
     .note-beat.n2 {
       background: radial-gradient(circle, #ffb87a 0%, #c06820 88%);
     }
+
     .note-beat.n3 {
       background: radial-gradient(circle, #ff9588 0%, #b34a38 88%);
     }
+
     .note-beat.n4 {
       background: radial-gradient(circle, #ff7e8a 0%, #a33650 88%);
     }
+
     .note-beat.n5 {
       background: radial-gradient(circle, #ec5a78 0%, #8a1a42 88%);
     }
+
     .note-beat.n6 {
       background: radial-gradient(circle, #d4325a 0%, #6b0e20 88%);
     }
@@ -515,7 +528,8 @@
       border: 1px dashed var(--gold);
       border-radius: 12px;
       overflow: hidden;
-      touch-action: none; /* don't let the browser steal touches for page-scroll */
+      touch-action: none;
+      /* don't let the browser steal touches for page-scroll */
     }
 
     /* Havan kund — sacred fire pit */
@@ -1029,8 +1043,11 @@
       padding-bottom: clamp(28px, 7vh, 60px);
       overflow-y: auto;
     }
+
     @media (min-height: 820px) {
-      #finale { justify-content: center; }
+      #finale {
+        justify-content: center;
+      }
     }
 
     .finale-title {
@@ -1083,14 +1100,15 @@
       will-change: transform;
       animation: petal-fall var(--petal-dur, 8s) linear forwards;
     }
+
     @keyframes petal-fall {
       from {
         transform: translate3d(0, 0, 0) rotate(0deg);
       }
+
       to {
         transform:
-          translate3d(var(--petal-drift, 0px), calc(100vh + 60px), 0)
-          rotate(var(--petal-spin, 720deg));
+          translate3d(var(--petal-drift, 0px), calc(100vh + 60px), 0) rotate(var(--petal-spin, 720deg));
       }
     }
 
@@ -1536,7 +1554,7 @@
           <div class="basket-contents" id="basket-contents"></div>
         </div>
       </div>
-      <div class="score-display">Collected: <span id="haldi-score">0</span> / 16<br><span class="shringaar-hint">
+      <div class="score-display">Collected: <span id="haldi-score">0</span> / 16 yellow flowers<br><span class="shringaar-hint">
           shringaar</span></div>
     </div>
 
@@ -1620,7 +1638,7 @@
           <img src="indian_bride_and_groom.svg" alt="" class="couple-img" draggable="false" />
         </div>
       </div>
-      <div class="score-display" style="margin-top:12px; font-style:italic;">Guide the couple<br> around the sacred fire
+      <div class="score-display" style="margin-top:12px; font-style:italic;">Guide the couple<br> around agni
       </div>
     </div>
 
@@ -1644,8 +1662,9 @@
         </p>
         <p>
           <span class="addressed-to">Sachin —</span>
-          I haven't met you yet, but Vinshu chose you, and that tells me what I need to know.
-          Take care of her, and let her take care of you. You've got a brother now.
+          our families don't really need introductions at this point — your big brother
+          and our didi already linked us up. We've only crossed paths a few times.
+          Looking forward to many more.
         </p>
         <p>
           May your marriage be full of the big &amp; small, ordinary &amp; extraordinary moments of joy.
@@ -1761,9 +1780,10 @@
 
     /* =================== STAGE 1: HALDI =================== */
     const HALDI_TARGET = 16;
-    const HALDI_ITEMS = ['🌼', '🌻', '🌸', '💛', '✨', '🌺'];
-    // Hearts and sparkles fall for variety but don't go in the basket — only flowers count
-    const HALDI_FLOWERS = new Set(['🌼', '🌻', '🌸', '🌺']);
+    // Yellow flowers carry the haldi color. Pinks, hearts, sparkles fall as
+    // decoys — visible but not catchable.
+    const HALDI_ITEMS = ['🌼', '🌼', '🌻', '🌻', '🌸', '💛', '✨', '🌺'];
+    const HALDI_FLOWERS = new Set(['🌼', '🌻']);
     let haldiScore = 0;
     let haldiActive = false;
     let haldiInterval = null;
@@ -2821,14 +2841,14 @@
       // lost and the couple would stall mid-circle.
       area.addEventListener('pointerdown', (e) => {
         lastAngle = null;
-        try { area.setPointerCapture?.(e.pointerId); } catch (_) {}
+        try { area.setPointerCapture?.(e.pointerId); } catch (_) { }
         handleMove(e);
       });
       area.addEventListener('pointermove', handleMove);
       area.addEventListener('pointerup', (e) => {
         lastAngle = null;
         if (area.releasePointerCapture) {
-          try { area.releasePointerCapture(e.pointerId); } catch (_) {}
+          try { area.releasePointerCapture(e.pointerId); } catch (_) { }
         }
       });
       area.addEventListener('pointercancel', () => { lastAngle = null; });
