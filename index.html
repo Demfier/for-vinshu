@@ -357,7 +357,7 @@
          ~7% right and ~14% below wrap-center.
          Lift z-index above the bride (3) so the pattern reads as
          a decoration ON her hand, not behind her body. */
-      transform: translate(20%, 36%) scale(0.10);
+      transform: translate(22%, 22%) scale(0.10);
       border-color: transparent;
       box-shadow: none;
       z-index: 4;
@@ -872,13 +872,13 @@
       }
     }
 
-    /* Indian wedding couple — chibi illustration */
+    /* Indian wedding couple — chibi illustration (new: bride+groom holding hands) */
     .couple {
       position: absolute;
       left: 0;
       top: 0;
-      width: 120px;
-      height: 132px;
+      width: 140px;
+      height: 128px;
       filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.3));
       z-index: 3;
       pointer-events: none;
@@ -1588,7 +1588,7 @@
         <div class="stage-devanagari">हल्दी</div>
       </div>
       <div id="haldi-area">
-        <img class="haldi-bride" id="haldi-bride" src="assets/haldi-bride.png" alt="" aria-hidden="true" draggable="false">
+        <img class="haldi-bride" id="haldi-bride" src="assets/sprites/bride-idle.png" alt="" aria-hidden="true" draggable="false">
         <div class="haldi-basket" id="haldi-basket" aria-hidden="true">
           <div class="basket-body"></div>
           <div class="basket-rim"></div>
@@ -1611,7 +1611,7 @@
       <div class="mehndi-wrap" id="mehndi-wrap">
         <canvas id="mehndi-base" width="360" height="360" aria-hidden="true"></canvas>
         <canvas id="mehndi-mask" width="360" height="360" aria-label="Tap to reveal mehndi"></canvas>
-        <img class="mehndi-bride" id="mehndi-bride" src="assets/mehndi-bride.png" alt="" aria-hidden="true" draggable="false">
+        <img class="mehndi-bride" id="mehndi-bride" src="assets/sprites/bride-mehndi.png" alt="" aria-hidden="true" draggable="false">
         <div class="mehndi-progress" id="mehndi-progress">Tap to reveal the mehndi · 0 / 12</div>
       </div>
     </div>
@@ -1677,7 +1677,7 @@
           <span class="ember e5"></span>
         </div>
         <div class="couple" id="couple" aria-label="Indian bride and groom">
-          <img src="assets/couple.png" alt="" class="couple-img" draggable="false" />
+          <img src="assets/sprites/couple.png" alt="" class="couple-img" draggable="false" />
         </div>
       </div>
       <div class="score-display" style="margin-top:12px; font-style:italic;">Guide the couple<br> around agni
@@ -2838,9 +2838,9 @@
       function updateCouple() {
         const cx = area.clientWidth / 2;
         const cy = area.clientHeight / 2;
-        // Couple is 120×132 — offset by half each axis to centre on the orbit point
-        const x = cx + Math.cos(pheraAngle) * radius - 60;
-        const y = cy + Math.sin(pheraAngle) * radius - 66;
+        // Couple is 140×128 — offset by half each axis to centre on the orbit point
+        const x = cx + Math.cos(pheraAngle) * radius - 70;
+        const y = cy + Math.sin(pheraAngle) * radius - 64;
         couple.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       }
       updateCouple();
