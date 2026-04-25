@@ -296,14 +296,18 @@
       letter-spacing: 0.1em;
     }
 
-    /* ----------- STAGE 2: MEHNDI (mandala reveal → zooms out, bride fades in) ----------- */
+    /* ----------- STAGE 2: MEHNDI (zoom into palm → tap-reveal → zoom out) ----------- */
     .mehndi-wrap {
       position: relative;
       width: min(360px, 86vw);
       aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid var(--gold);
+      box-shadow: inset 0 0 40px rgba(212, 162, 76, 0.2), 0 10px 30px rgba(107, 31, 43, 0.15);
+      transition: border-color 0.6s ease;
     }
 
-    #mehndi-base,
     #mehndi-mask {
       position: absolute;
       top: 0;
@@ -312,56 +316,38 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 1px solid var(--gold);
-      box-shadow: inset 0 0 40px rgba(212, 162, 76, 0.2), 0 10px 30px rgba(107, 31, 43, 0.15);
-      transition: transform 1.4s cubic-bezier(0.4, 0.0, 0.2, 1), border-color 0.6s ease;
-      transform-origin: center center;
-    }
-
-    #mehndi-base {
-      z-index: 1;
-    }
-
-    #mehndi-mask {
       cursor: pointer;
       touch-action: none;
       z-index: 2;
-      border-color: transparent;
-      box-shadow: none;
+      transition: opacity 1.3s ease;
     }
 
-    /* Bride sprite that fades in once the mandala is revealed. The mandala
-       then shrinks onto her hand — camera "zooms out" from a close-up of
-       the henna pattern to the full bride. */
+    /* Bride sprite — starts zoomed into her left hand (viewer's right) so
+       the visible area reads as a close-up of the henna; on reveal scales
+       back to 1. transform-origin sits on the hand so scaling pivots around
+       it; the recenter translate is independent of scale. */
     .mehndi-bride {
       position: absolute;
       top: 50%;
       left: 50%;
       width: 70%;
       height: auto;
-      transform: translate(-50%, -50%) scale(0.55);
-      opacity: 0;
+      transform-origin: 84.6% 66.7%; /* back-of-hand center in 408×525 sprite ≈ (345, 350) */
+      transform: translate(-34.5%, -16.7%) translate(-50%, -50%) scale(4.5);
       pointer-events: none;
       user-select: none;
       -webkit-user-drag: none;
-      z-index: 3;
+      z-index: 1;
       filter: drop-shadow(0 6px 16px rgba(107, 31, 43, 0.25));
-      transition: opacity 1.4s ease, transform 1.4s cubic-bezier(0.34, 1.0, 0.6, 1.0);
+      transition: transform 1.6s cubic-bezier(0.34, 1.0, 0.6, 1.0);
     }
 
-    .mehndi-wrap.revealed #mehndi-base,
     .mehndi-wrap.revealed #mehndi-mask {
-      /* Shrink the mandala and slide it onto her right palm.
-         Bride is centered (scale 1, translate -50% -50%); her palm sits
-         ~18% right and 20% below the wrap center. */
-      transform: translate(18%, 20%) scale(0.13);
-      border-color: transparent;
-      box-shadow: none;
-      z-index: 4;
+      opacity: 0;
+      pointer-events: none;
     }
 
     .mehndi-wrap.revealed .mehndi-bride {
-      opacity: 1;
       transform: translate(-50%, -50%) scale(1);
     }
 
@@ -540,14 +526,14 @@
       text-transform: uppercase;
     }
 
-    /* Vinshu dancing — alternates between two pose sprites per beat */
+    /* Vinshu dancing — cycles through 5 distinct pose sprites per beat */
     .sangeet-dancer {
       position: absolute;
       bottom: 8px;
       left: 50%;
       width: 84px;
       height: auto;
-      transform: translateX(-50%) scale(1) rotate(0deg);
+      transform: translateX(-50%) scale(1);
       transform-origin: 50% 90%;
       transition: transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: none;
@@ -1212,62 +1198,95 @@
       text-align: center;
     }
 
-    /* Haldi basket (wicker) */
+    /* Haldi basket — wicker with arched handle, dark cartoon outline */
     .haldi-basket {
       position: absolute;
       bottom: 10px;
       left: 50%;
       transform: translateX(-50%) rotate(0deg);
-      width: 120px;
-      height: 72px;
+      width: 100px;
+      height: 90px;
       pointer-events: none;
       z-index: 2;
       transition: transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1);
+      filter: drop-shadow(0 4px 6px rgba(80, 50, 20, 0.25));
+    }
+
+    /* Handle — dark wicker arc rising over the rim */
+    .haldi-basket::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 16%;
+      right: 16%;
+      height: 36px;
+      border: 7px solid #5a3818;
+      border-bottom: none;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      background: linear-gradient(180deg, transparent 70%, transparent);
+    }
+
+    /* Inner highlight on handle for depth */
+    .haldi-basket::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 18%;
+      right: 18%;
+      height: 32px;
+      border: 2.5px solid #c69a6a;
+      border-bottom: none;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      pointer-events: none;
     }
 
     .haldi-basket .basket-rim {
       position: absolute;
-      top: 0;
+      top: 28px;
       left: -4%;
       width: 108%;
-      height: 18px;
+      height: 16px;
       background:
-        radial-gradient(ellipse at center, #a05a1e 0%, #6b2f12 75%, #3d1a08 100%);
+        radial-gradient(ellipse at center, #c69466 0%, #8b5a2b 70%, #4a2c10 100%);
       border-radius: 50%;
-      box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.2);
+      border: 2px solid #3d260c;
+      box-shadow: inset 0 -3px 5px rgba(40, 25, 8, 0.5);
     }
 
     .haldi-basket .basket-body {
       position: absolute;
-      top: 10px;
+      top: 38px;
       left: 0;
       right: 0;
       bottom: 0;
       background:
-        repeating-linear-gradient(48deg, #a05a1e 0 4px, #7a3c14 4px 8px, #6b2f12 8px 12px),
-        linear-gradient(180deg, #a05a1e, #5a2b0e);
-      clip-path: polygon(7% 0%, 93% 0%, 100% 100%, 0% 100%);
-      border-radius: 0 0 50% 50% / 0 0 45% 45%;
-      box-shadow: inset 0 -5px 8px rgba(0, 0, 0, 0.4), 0 4px 10px rgba(0, 0, 0, 0.25);
+        repeating-linear-gradient(48deg, #d8a972 0 4px, #b58054 4px 8px, #8e5a2c 8px 12px),
+        linear-gradient(180deg, #d8a972, #6f4720);
+      clip-path: polygon(8% 0%, 92% 0%, 96% 100%, 4% 100%);
+      border-radius: 0 0 48% 48% / 0 0 60% 60%;
+      box-shadow:
+        inset 0 -5px 8px rgba(40, 25, 8, 0.45),
+        inset 0 0 0 2.5px #3d260c;
     }
 
     .haldi-basket .basket-body::after {
-      /* horizontal weave lines */
+      /* Cross-hatch weave — both diagonals for woven texture */
       content: '';
       position: absolute;
-      inset: 2px 2px 6px 2px;
+      inset: 3px 3px 5px 3px;
       background:
-        repeating-linear-gradient(90deg, transparent 0 8px, rgba(40, 20, 8, 0.45) 8px 9px);
+        repeating-linear-gradient(132deg, transparent 0 6px, rgba(40, 25, 8, 0.5) 6px 7px),
+        repeating-linear-gradient(48deg, transparent 0 6px, rgba(40, 25, 8, 0.3) 6px 7px);
       clip-path: inherit;
-      opacity: 0.8;
+      opacity: 0.85;
     }
 
     .basket-contents {
       position: absolute;
-      top: 4px;
+      top: 32px;
       left: 8%;
       width: 84%;
-      height: 26px;
+      height: 22px;
       pointer-events: none;
       overflow: visible;
     }
@@ -1587,7 +1606,8 @@
         <div class="stage-devanagari">हल्दी</div>
       </div>
       <div id="haldi-area">
-        <img class="haldi-bride" id="haldi-bride" src="assets/sprites/bride-idle.png" alt="" aria-hidden="true" draggable="false">
+        <img class="haldi-bride" id="haldi-bride" src="assets/sprites/bride-idle.png" alt="" aria-hidden="true"
+          draggable="false">
         <div class="haldi-basket" id="haldi-basket" aria-hidden="true">
           <div class="basket-body"></div>
           <div class="basket-rim"></div>
@@ -1608,9 +1628,9 @@
         <div class="stage-devanagari">मेहंदी</div>
       </div>
       <div class="mehndi-wrap" id="mehndi-wrap">
-        <canvas id="mehndi-base" width="360" height="360" aria-hidden="true"></canvas>
+        <img class="mehndi-bride" id="mehndi-bride" src="assets/sprites/bride-mehndi.png" alt="" aria-hidden="true"
+          draggable="false">
         <canvas id="mehndi-mask" width="360" height="360" aria-label="Tap to reveal mehndi"></canvas>
-        <img class="mehndi-bride" id="mehndi-bride" src="assets/sprites/bride-mehndi.png" alt="" aria-hidden="true" draggable="false">
         <div class="mehndi-progress" id="mehndi-progress">Tap to reveal the mehndi · 0 / 12</div>
       </div>
     </div>
@@ -1629,7 +1649,8 @@
           <span id="sangeet-hits">Caught: 0 / 7</span>
           <span id="sangeet-next" class="sangeet-next">Next: <strong>सा</strong> Sa</span>
         </div>
-        <img class="sangeet-dancer" id="sangeet-dancer" src="assets/sprites/bride-pose-1.png" alt="" aria-hidden="true" draggable="false">
+        <img class="sangeet-dancer" id="sangeet-dancer" src="assets/sprites/bride-pose-1.png" alt="" aria-hidden="true"
+          draggable="false">
         <div class="hit-flash" id="hit-flash"></div>
         <div class="miss-flash" id="miss-flash"></div>
       </div>
@@ -1696,20 +1717,19 @@
           to dance with you, to see you get married.
         </p>
         <p>
+          May your marriage be full of the big &amp; small, ordinary &amp; extraordinary moments of joy.
+          May you be each other's biggest cheerleaders, truest readers, and safest places.
+          May you love each other the way you both deserve, which is to say, completely.
+        </p>
+        <p>
           <span class="addressed-to">Vinshu —</span>
           Watching you become someone's whole world is only surprising to the people
-          who don't already know you. I've known you since childhood and I've been
-          quietly watching you become extraordinary the whole time.
+          who don't already know you. I've seen the extraordinary in you the whole time.
         </p>
         <p>
           <span class="addressed-to">Sachin —</span>
           our families don't really need introductions at this point.
-          Glad it's you. See you both soon — properly, this time.
-        </p>
-        <p>
-          May your marriage be full of the big &amp; small, ordinary &amp; extraordinary moments of joy.
-          May you be each other's biggest cheerleaders, truest readers, and safest places.
-          May you love each other the way you both deserve, which is to say, completely.
+          I'm glad it's you! See you both soon — properly, this time.
         </p>
         <p>
           God bless you both.
@@ -2030,9 +2050,7 @@
     let mehndiDone = false;
 
     function startMehndi() {
-      const base = document.getElementById('mehndi-base');
       const mask = document.getElementById('mehndi-mask');
-      drawMehndiBase(base.getContext('2d'));
       drawMehndiMask(mask.getContext('2d'));
       // Reset reveal/zoom on replay
       document.getElementById('mehndi-wrap').classList.remove('revealed');
@@ -2050,324 +2068,35 @@
       }
     }
 
-    function drawMehndiBase(ctx) {
-      ctx.clearRect(0, 0, MEHNDI_SIZE, MEHNDI_SIZE);
-      const cx = MEHNDI_SIZE / 2, cy = MEHNDI_SIZE / 2;
-
-      // Warm palm-tone radial background
-      const bg = ctx.createRadialGradient(cx, cy, 20, cx, cy, MEHNDI_SIZE * 0.55);
-      bg.addColorStop(0, '#fff8e5');
-      bg.addColorStop(1, '#e8c891');
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, MEHNDI_SIZE, MEHNDI_SIZE);
-
-      const HENNA = '#6b2f14';
-      const HENNA_MED = '#8b3a1f';
-      const HENNA_SOFT = 'rgba(107, 47, 20, 0.5)';
-      const HENNA_FAINT = 'rgba(107, 47, 20, 0.32)';
-
-      ctx.strokeStyle = HENNA;
-      ctx.fillStyle = HENNA;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
-      // ---------- CENTER: dot + 8-point starburst ----------
-      ctx.lineWidth = 1.1;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 2.6, 0, Math.PI * 2);
-      ctx.fill();
-      for (let i = 0; i < 8; i++) {
-        const a = (i / 8) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(a) * 4, cy + Math.sin(a) * 4);
-        ctx.lineTo(cx + Math.cos(a) * 8, cy + Math.sin(a) * 8);
-        ctx.stroke();
-      }
-
-      // ---------- INNER LOTUS (r ≈ 10–24): 8 main + 8 interleaved petals ----------
-      ctx.lineWidth = 1.4;
-      for (let i = 0; i < 8; i++) {
-        const a = (i / 8) * Math.PI * 2;
-        ctx.save();
-        ctx.translate(cx + Math.cos(a) * 15, cy + Math.sin(a) * 15);
-        ctx.rotate(a + Math.PI / 2);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 4, 11, 0, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(0, 3, 0.9, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-      ctx.strokeStyle = HENNA_MED;
-      ctx.lineWidth = 0.95;
-      for (let i = 0; i < 8; i++) {
-        const a = ((i + 0.5) / 8) * Math.PI * 2;
-        ctx.save();
-        ctx.translate(cx + Math.cos(a) * 17, cy + Math.sin(a) * 17);
-        ctx.rotate(a + Math.PI / 2);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 2, 6, 0, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-      }
-      ctx.strokeStyle = HENNA;
-
-      // ---------- RING 1 (r=30) with 12 rosettes on the ring ----------
-      ctx.lineWidth = 0.9;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 30, 0, Math.PI * 2);
-      ctx.stroke();
-      for (let i = 0; i < 12; i++) {
-        const a = (i / 12) * Math.PI * 2;
-        const px = cx + Math.cos(a) * 30;
-        const py = cy + Math.sin(a) * 30;
-        ctx.beginPath();
-        ctx.arc(px, py, 2.2, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(px, py, 0.8, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // ---------- VINE RAYS (r 34–50): 12 S-shaped vines with bud tips ----------
-      ctx.lineWidth = 1.1;
-      for (let i = 0; i < 12; i++) {
-        const a = (i / 12) * Math.PI * 2;
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(a);
-        ctx.beginPath();
-        ctx.moveTo(0, -34);
-        ctx.bezierCurveTo(5, -38, 5, -46, 0, -49);
-        ctx.bezierCurveTo(-5, -46, -5, -38, 0, -34);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(0, -51, 1.2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      // ---------- RING 2 (r=56) ----------
-      ctx.lineWidth = 0.9;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 56, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // ---------- DETAILED PAISLEY RING (r=72): 12 ornate mangoes ----------
-      for (let i = 0; i < 12; i++) {
-        const a = (i / 12) * Math.PI * 2;
-        const px = cx + Math.cos(a) * 72;
-        const py = cy + Math.sin(a) * 72;
-        ctx.save();
-        ctx.translate(px, py);
-        ctx.rotate(a + Math.PI);
-        // Outer teardrop
-        ctx.lineWidth = 1.4;
-        ctx.beginPath();
-        ctx.moveTo(0, -16);
-        ctx.bezierCurveTo(11, -11, 10, 10, 0, 17);
-        ctx.bezierCurveTo(-10, 10, -11, -11, 0, -16);
-        ctx.stroke();
-        // Larger inner curl
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(0, -11);
-        ctx.bezierCurveTo(6, -8, 6, 6, 0, 10);
-        ctx.stroke();
-        // Smaller inner curl
-        ctx.beginPath();
-        ctx.moveTo(0, -6);
-        ctx.bezierCurveTo(3, -4, 3, 3, 0, 5);
-        ctx.stroke();
-        // Tip ornament — 3 dots
-        ctx.beginPath(); ctx.arc(0, -19, 1.1, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(-2.2, -20.5, 0.7, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(2.2, -20.5, 0.7, 0, Math.PI * 2); ctx.fill();
-        // Tiny base leaves
-        ctx.strokeStyle = HENNA_MED;
-        ctx.lineWidth = 0.9;
-        ctx.beginPath();
-        ctx.moveTo(-3, 16);
-        ctx.quadraticCurveTo(-5, 19, -7, 17);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(3, 16);
-        ctx.quadraticCurveTo(5, 19, 7, 17);
-        ctx.stroke();
-        ctx.strokeStyle = HENNA;
-        ctx.restore();
-      }
-      // Vine-fleuret between every paisley pair
-      ctx.strokeStyle = HENNA_MED;
-      for (let i = 0; i < 12; i++) {
-        const a = ((i + 0.5) / 12) * Math.PI * 2;
-        const px = cx + Math.cos(a) * 78;
-        const py = cy + Math.sin(a) * 78;
-        ctx.lineWidth = 0.9;
-        ctx.beginPath();
-        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(px, py, 0.7, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.strokeStyle = HENNA;
-
-      // ---------- DOUBLE-RING BAND (r=90, 94) + 36 dots between ----------
-      ctx.lineWidth = 0.75;
-      ctx.strokeStyle = HENNA_SOFT;
-      ctx.beginPath(); ctx.arc(cx, cy, 90, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx, cy, 94, 0, Math.PI * 2); ctx.stroke();
-      ctx.strokeStyle = HENNA;
-      for (let i = 0; i < 36; i++) {
-        const a = (i / 36) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.arc(cx + Math.cos(a) * 92, cy + Math.sin(a) * 92, 0.85, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // ---------- MEDALLION RING (r=112): 16 fancy medallions ----------
-      for (let i = 0; i < 16; i++) {
-        const a = (i / 16) * Math.PI * 2;
-        const px = cx + Math.cos(a) * 112;
-        const py = cy + Math.sin(a) * 112;
-        // Outer medallion circle
-        ctx.lineWidth = 1.1;
-        ctx.beginPath();
-        ctx.arc(px, py, 8, 0, Math.PI * 2);
-        ctx.stroke();
-        // Inner 4-petal flower
-        ctx.save();
-        ctx.translate(px, py);
-        ctx.rotate(a);
-        for (let j = 0; j < 4; j++) {
-          const pa = (j / 4) * Math.PI * 2;
-          ctx.beginPath();
-          ctx.ellipse(Math.cos(pa) * 2.5, Math.sin(pa) * 2.5, 1.4, 3.5, pa + Math.PI / 2, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-        // Center dot
-        ctx.beginPath();
-        ctx.arc(0, 0, 1, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-        // 6 dots orbiting outside
-        for (let j = 0; j < 6; j++) {
-          const pa = (j / 6) * Math.PI * 2;
-          ctx.beginPath();
-          ctx.arc(px + Math.cos(pa) * 10.5, py + Math.sin(pa) * 10.5, 0.65, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-      // Curlicues between medallions
-      ctx.strokeStyle = HENNA_MED;
-      ctx.lineWidth = 0.9;
-      for (let i = 0; i < 16; i++) {
-        const a = ((i + 0.5) / 16) * Math.PI * 2;
-        const px = cx + Math.cos(a) * 112;
-        const py = cy + Math.sin(a) * 112;
-        ctx.save();
-        ctx.translate(px, py);
-        ctx.rotate(a + Math.PI / 2);
-        ctx.beginPath();
-        ctx.moveTo(-4, 0);
-        ctx.quadraticCurveTo(0, -4, 4, 0);
-        ctx.quadraticCurveTo(0, 4, -4, 0);
-        ctx.stroke();
-        ctx.restore();
-      }
-      ctx.strokeStyle = HENNA;
-
-      // ---------- RING 3 (r=128) ----------
-      ctx.lineWidth = 0.85;
-      ctx.strokeStyle = HENNA_SOFT;
-      ctx.beginPath(); ctx.arc(cx, cy, 128, 0, Math.PI * 2); ctx.stroke();
-      ctx.strokeStyle = HENNA;
-
-      // ---------- LEAF GARLAND (r=142): 24 leaves with veins + buds ----------
-      for (let i = 0; i < 24; i++) {
-        const a = (i / 24) * Math.PI * 2;
-        const px = cx + Math.cos(a) * 142;
-        const py = cy + Math.sin(a) * 142;
-        ctx.save();
-        ctx.translate(px, py);
-        ctx.rotate(a + Math.PI / 2);
-        ctx.lineWidth = 1.1;
-        ctx.beginPath();
-        ctx.moveTo(0, -9);
-        ctx.bezierCurveTo(5, -5, 5, 5, 0, 9);
-        ctx.bezierCurveTo(-5, 5, -5, -5, 0, -9);
-        ctx.stroke();
-        ctx.lineWidth = 0.6;
-        ctx.beginPath();
-        ctx.moveTo(0, -7);
-        ctx.lineTo(0, 7);
-        ctx.stroke();
-        ctx.restore();
-      }
-      for (let i = 0; i < 24; i++) {
-        const a = ((i + 0.5) / 24) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.arc(cx + Math.cos(a) * 142, cy + Math.sin(a) * 142, 1.1, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // ---------- LAYERED DOT RINGS (r=156 / 164 / 172) ----------
-      ctx.fillStyle = HENNA;
-      for (let i = 0; i < 48; i++) {
-        const a = (i / 48) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.arc(cx + Math.cos(a) * 156, cy + Math.sin(a) * 156, 1.15, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.fillStyle = HENNA_MED;
-      for (let i = 0; i < 36; i++) {
-        const a = (i / 36 + 0.5 / 36) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.arc(cx + Math.cos(a) * 164, cy + Math.sin(a) * 164, 0.95, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.fillStyle = HENNA;
-      for (let i = 0; i < 72; i++) {
-        const a = (i / 72) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.arc(cx + Math.cos(a) * 172, cy + Math.sin(a) * 172, 0.65, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // ---------- OUTERMOST FAINT RING (r=178) ----------
-      ctx.lineWidth = 0.55;
-      ctx.strokeStyle = HENNA_FAINT;
-      ctx.beginPath(); ctx.arc(cx, cy, 178, 0, Math.PI * 2); ctx.stroke();
-      ctx.strokeStyle = HENNA;
-    }
 
     function drawMehndiMask(ctx) {
       ctx.clearRect(0, 0, MEHNDI_SIZE, MEHNDI_SIZE);
 
-      // Solid cream overlay (the "henna paste" covering the design)
+      // Wet henna paste — olive-brown radial blob covering the close-up palm
       const g = ctx.createRadialGradient(
         MEHNDI_SIZE / 2, MEHNDI_SIZE / 2, 40,
         MEHNDI_SIZE / 2, MEHNDI_SIZE / 2, MEHNDI_SIZE * 0.6
       );
-      g.addColorStop(0, '#f5e4c0');
-      g.addColorStop(1, '#d9bf8a');
+      g.addColorStop(0, '#7a6a3d');
+      g.addColorStop(1, '#3d2f12');
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, MEHNDI_SIZE, MEHNDI_SIZE);
 
-      // Faint gold hint of the pattern beneath, so the user sees the shape of what's hidden
-      ctx.strokeStyle = 'rgba(139, 58, 31, 0.18)';
-      ctx.lineWidth = 1;
-      [42, 92, 132, 168].forEach(r => {
+      // Subtle paste streak texture so it reads as wet, not flat fill
+      ctx.strokeStyle = 'rgba(255, 240, 200, 0.07)';
+      ctx.lineWidth = 1.4;
+      for (let i = 0; i < 14; i++) {
+        const a = (i / 14) * Math.PI * 2;
+        const r1 = 30 + (i % 3) * 18;
+        const r2 = r1 + 60 + (i % 4) * 12;
         ctx.beginPath();
-        ctx.arc(MEHNDI_SIZE / 2, MEHNDI_SIZE / 2, r, 0, Math.PI * 2);
+        ctx.moveTo(MEHNDI_SIZE / 2 + Math.cos(a) * r1, MEHNDI_SIZE / 2 + Math.sin(a) * r1);
+        ctx.lineTo(MEHNDI_SIZE / 2 + Math.cos(a + 0.04) * r2, MEHNDI_SIZE / 2 + Math.sin(a + 0.04) * r2);
         ctx.stroke();
-      });
+      }
 
-      // Little "tap here" cue dots around the circle, subtly visible
-      // Cue dots — spread to encourage taps across the pattern
-      ctx.fillStyle = 'rgba(107, 47, 20, 0.22)';
+      // "Tap here" cue dots — lighter spots that hint at the pattern beneath
+      ctx.fillStyle = 'rgba(255, 240, 200, 0.18)';
       const cues = [
         [180, 180], [180, 100], [260, 180], [180, 260], [100, 180],
         [232, 128], [232, 232], [128, 232], [128, 128],
@@ -2406,15 +2135,14 @@
 
       if (mehndiStampCount >= MEHNDI_TARGET && !mehndiDone) {
         mehndiDone = true;
-        // Smooth reveal — fade the remaining mask opacity to 0 so the mandala
-        // underneath blooms into view instead of appearing instantly.
-        mask.style.transition = 'opacity 1.3s ease';
+        // Fade off the paste so the henna pattern is fully visible, then
+        // pull the camera back to reveal the whole bride.
+        mask.style.transition = 'opacity 1.0s ease';
         mask.style.opacity = '0';
         document.getElementById('mehndi-progress').textContent = 'Beautiful ✨';
-        // Then zoom out — mandala shrinks to her hand, bride fades in around it
         setTimeout(() => {
           document.getElementById('mehndi-wrap').classList.add('revealed');
-        }, 900);
+        }, 700);
         setTimeout(() => {
           showTransition('A bride-to-be with the prettiest hands 🤎', nextStage);
         }, 3600);
@@ -2438,22 +2166,18 @@
       { name: 'Ni', deva: 'नि', freq: 493.88 }, // B4
     ];
     const SANGEET_TARGET = SAAT_SUR.length;
-    // Two pose sprites of Vinshu — alternated per note with tilt + scale variations
-    // so each beat reads as a distinct dance pose.
+    // Five distinct pose sprites of Vinshu — one per note, no tilt needed.
+    // Order roughly progresses idle → walk → run, scale grows for finale energy.
     const DANCER_POSES = [
-      'assets/sprites/bride-pose-1.png',
-      'assets/sprites/bride-pose-2.png',
+      'assets/sprites/bride-pose-1.png', // standing — Sa
+      'assets/sprites/bride-pose-2.png', // walk left foot — Re
+      'assets/sprites/bride-pose-3.png', // walk right foot — Ga
+      'assets/sprites/bride-pose-4.png', // dance arm-extended — Ma
+      'assets/sprites/bride-pose-5.png', // running twirl — Pa
+      'assets/sprites/bride-pose-4.png', // dance arm-extended — Dha
+      'assets/sprites/bride-pose-5.png', // running twirl — Ni
     ];
-    const DANCER_TILTS = [
-      'rotate(0deg)',                     // Sa  — upright
-      'rotate(-10deg) translateY(-3px)',  // Re  — lean left
-      'rotate(10deg)  translateY(-3px)',  // Ga  — lean right
-      'rotate(-15deg) translateY(-10px)', // Ma  — leap left
-      'rotate(14deg)  translateY(-4px)',  // Pa  — sway right + lift
-      'rotate(-10deg) translateY(-14px)', // Dha — big leap
-      'rotate(8deg)   translateY(-10px)', // Ni  — finale flourish
-    ];
-    const DANCER_SCALES = [1.00, 1.04, 1.08, 1.14, 1.10, 1.20, 1.28];
+    const DANCER_SCALES = [1.00, 1.05, 1.10, 1.16, 1.22, 1.26, 1.32];
 
     function setDancerPose(idx) {
       const d = document.getElementById('sangeet-dancer');
@@ -2461,30 +2185,31 @@
       const src = DANCER_POSES[idx % DANCER_POSES.length];
       if (!d.src.endsWith(src)) d.src = src;
       const scale = DANCER_SCALES[idx] ?? 1;
-      const tilt  = DANCER_TILTS[idx]  ?? 'rotate(0deg)';
-      d.style.transform = `translateX(-50%) scale(${scale}) ${tilt}`;
+      d.style.transform = `translateX(-50%) scale(${scale})`;
     }
     function resetDancer() {
       const d = document.getElementById('sangeet-dancer');
       if (!d) return;
       d.src = DANCER_POSES[0];
-      d.style.transform = 'translateX(-50%) scale(1) rotate(0deg)';
+      d.style.transform = 'translateX(-50%) scale(1)';
     }
-    // After Ni, alternate the two poses rapidly with growing tilts — finale dance
+    // After Ni, cycle through every distinct pose rapidly — finale dance
     function dancerVictoryCycle() {
       const d = document.getElementById('sangeet-dancer');
       if (!d) return;
-      const finaleTilts = [
-        'rotate(-14deg) translateY(-8px)',
-        'rotate(14deg)  translateY(-8px)',
-        'rotate(-10deg) translateY(-16px)',
-        'rotate(10deg)  translateY(-16px)',
+      // Distinct poses in mixed order so consecutive frames never repeat
+      const finaleOrder = [
+        'assets/sprites/bride-pose-4.png',
+        'assets/sprites/bride-pose-2.png',
+        'assets/sprites/bride-pose-5.png',
+        'assets/sprites/bride-pose-3.png',
+        'assets/sprites/bride-pose-4.png',
+        'assets/sprites/bride-pose-5.png',
       ];
       let i = 0;
       const id = setInterval(() => {
-        d.src = DANCER_POSES[i % DANCER_POSES.length];
-        const tilt = finaleTilts[i % finaleTilts.length];
-        d.style.transform = `translateX(-50%) scale(1.25) ${tilt}`;
+        d.src = finaleOrder[i % finaleOrder.length];
+        d.style.transform = 'translateX(-50%) scale(1.32)';
         i++;
         if (i >= 14) clearInterval(id); // ~2.8s of dancing at 200ms per swap
       }, 200);
