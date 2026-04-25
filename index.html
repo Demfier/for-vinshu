@@ -563,8 +563,8 @@
       width: auto;
       height: 120px;
       --scale: 1;
-      --offset-x: min(180px, 30vw);
-      --offset-y: -120px;
+      --offset-x: max(-180px, -30vw);
+      --offset-y: -100px;
       transform: translate(-50%, -50%) translate(var(--offset-x), var(--offset-y)) scale(var(--scale));
       transform-origin: 50% 100%;
       transition: transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -1668,8 +1668,8 @@
         <div class="stage-devanagari">मेहंदी</div>
       </div>
       <div class="mehndi-wrap" id="mehndi-wrap">
-        <img class="mehndi-closeup" id="mehndi-closeup" src="assets/sprites/mehndi-hand.png" alt=""
-          aria-hidden="true" draggable="false">
+        <img class="mehndi-closeup" id="mehndi-closeup" src="assets/sprites/mehndi-hand.png" alt="" aria-hidden="true"
+          draggable="false">
         <img class="mehndi-bride" id="mehndi-bride" src="assets/sprites/bride-mehndi.png" alt="" aria-hidden="true"
           draggable="false">
         <canvas id="mehndi-mask" width="360" height="360" aria-label="Tap to reveal mehndi"></canvas>
@@ -2186,7 +2186,7 @@
           document.getElementById('mehndi-wrap').classList.add('revealed');
         }, 700);
         setTimeout(() => {
-          showTransition('A bride-to-be with the prettiest hands 🤎', nextStage);
+          showTransition('A bride with the prettiest hands 🤎', nextStage);
         }, 3600);
       }
     }
@@ -2528,7 +2528,7 @@
           // Cycle through every dance pose alongside the victory tune
           setTimeout(dancerVictoryCycle, 450);
           setTimeout(() => {
-            showTransition('You dance like joy itself ✨', nextStage);
+            showTransition('You dance like joy itself 💃', nextStage);
           }, 4200);
         }
       });
