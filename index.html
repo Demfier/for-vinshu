@@ -7,14 +7,14 @@
   <title>For Vinshu, with love ✦</title>
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%22 y=%2282%22 font-size=%2296%22 text-anchor=%22middle%22 fill=%22%23d4a24c%22>✦</text></svg>">
-  <meta name="description" content="A little something, on her wedding day.">
+  <meta name="description" content="A little something, from his Sunny bhaiya.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="For Vinshu">
-  <meta property="og:description" content="A little something, on her wedding day.">
+  <meta property="og:description" content="A little something, from his Sunny bhaiya.">
   <meta property="og:url" content="https://demfier.github.io/for-vinshu/">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="For Vinshu">
-  <meta name="twitter:description" content="A little something, on her wedding day.">
+  <meta name="twitter:description" content="A little something, from his Sunny bhaiya.">
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Marcellus&family=Tangerine:wght@400;700&display=swap"
     rel="stylesheet">
@@ -1245,20 +1245,50 @@
       animation: soundWave 2.4s ease-out infinite;
     }
 
-    .sunny-singer.playing .wave:nth-child(1) { animation-delay: 0s; }
-    .sunny-singer.playing .wave:nth-child(2) { animation-delay: 0.6s; }
-    .sunny-singer.playing .wave:nth-child(3) { animation-delay: 1.2s; }
-    .sunny-singer.playing .wave:nth-child(4) { animation-delay: 1.8s; }
+    .sunny-singer.playing .wave:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .sunny-singer.playing .wave:nth-child(2) {
+      animation-delay: 0.6s;
+    }
+
+    .sunny-singer.playing .wave:nth-child(3) {
+      animation-delay: 1.2s;
+    }
+
+    .sunny-singer.playing .wave:nth-child(4) {
+      animation-delay: 1.8s;
+    }
 
     @keyframes sunnyBob {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-6px) rotate(-1deg); }
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-6px) rotate(-1deg);
+      }
     }
 
     @keyframes soundWave {
-      0%   { transform: scale(0.5); opacity: 0; border-width: 4px; }
-      15%  { opacity: 0.55; }
-      100% { transform: scale(2.4); opacity: 0; border-width: 1px; }
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+        border-width: 4px;
+      }
+
+      15% {
+        opacity: 0.55;
+      }
+
+      100% {
+        transform: scale(2.4);
+        opacity: 0;
+        border-width: 1px;
+      }
     }
 
     .petal {
