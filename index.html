@@ -1625,7 +1625,7 @@
     <div class="screen" id="finale">
       <div class="fade-in" style="animation-delay: 0.3s">
         <div class="ornament">✦ ❦ ✦</div>
-        <h1 class="finale-title">Dear<br> Vinshu</h1>
+        <h1 class="finale-title">Dear Vinshu<br>&amp; Sachin</h1>
         <div class="scroll-ornament">⸻ ❦ ⸻</div>
       </div>
       <div class="letter fade-in" style="animation-delay: 1s">
@@ -1641,7 +1641,7 @@
         <p>
           May your marriage be full of the big &amp; small, ordinary &amp; extraordinary moments of joy.
           May you be each other's biggest cheerleaders, truest readers, and safest places.
-          May he love you the way you deserve, which is to say, completely.
+          May you love each other the way you both deserve, which is to say, completely.
         </p>
         <p>
           God bless you both.
@@ -2363,24 +2363,29 @@
       { name: 'Ni', deva: 'नि', freq: 493.88 }, // B4
     ];
     const SANGEET_TARGET = SAAT_SUR.length;
-    // Each pose is the same dancer at a different sway/leap — one per caught note
+    // A different feminine pose for each beat — emoji swap, not just rotation
     const DANCER_POSES = [
-      'translateX(-50%) scale(1)    rotate(0deg)',                    // Sa  — neutral
-      'translateX(-50%) scale(1.05) rotate(-15deg)',                  // Re  — sway left
-      'translateX(-50%) scale(1.10) rotate(15deg)',                   // Ga  — sway right
-      'translateX(-50%) scale(1.15) rotate(-22deg) translateY(-10px)', // Ma  — leap left
-      'translateX(-50%) scale(1.10) rotate(20deg)  translateY(-4px)',  // Pa  — sway right + lift
-      'translateX(-50%) scale(1.20) rotate(-12deg) translateY(-16px)', // Dha — bigger leap
-      'translateX(-50%) scale(1.30) rotate(8deg)   translateY(-12px)', // Ni  — finale flourish
+      { emoji: '💃',     transform: 'translateX(-50%) scale(1.0)' },                   // Sa  — classic dancer
+      { emoji: '🙋‍♀️', transform: 'translateX(-50%) scale(1.05)' },                  // Re  — raised arm
+      { emoji: '🙆‍♀️', transform: 'translateX(-50%) scale(1.10)' },                  // Ga  — arms above head
+      { emoji: '🤸‍♀️', transform: 'translateX(-50%) scale(1.15) translateY(-10px)' }, // Ma  — cartwheel, peak energy
+      { emoji: '💁‍♀️', transform: 'translateX(-50%) scale(1.10)' },                  // Pa  — tilted, hand on hip
+      { emoji: '🤾‍♀️', transform: 'translateX(-50%) scale(1.20) translateY(-12px)' }, // Dha — leaping/throwing
+      { emoji: '👯‍♀️', transform: 'translateX(-50%) scale(1.30) translateY(-8px)' },  // Ni  — finale duo
     ];
 
     function setDancerPose(idx) {
       const d = document.getElementById('sangeet-dancer');
-      if (d && DANCER_POSES[idx]) d.style.transform = DANCER_POSES[idx];
+      const p = DANCER_POSES[idx];
+      if (!d || !p) return;
+      d.textContent = p.emoji;
+      d.style.transform = p.transform;
     }
     function resetDancer() {
       const d = document.getElementById('sangeet-dancer');
-      if (d) d.style.transform = DANCER_POSES[0];
+      if (!d) return;
+      d.textContent = DANCER_POSES[0].emoji;
+      d.style.transform = DANCER_POSES[0].transform;
     }
     // Cycle through every pose in sequence — fired when Ni completes the saat sur
     function dancerVictoryCycle() {
